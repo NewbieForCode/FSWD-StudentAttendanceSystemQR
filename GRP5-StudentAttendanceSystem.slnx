@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GRP5-StudentAttendanceSystem/SAtS_API.csproj" />
+  <Project Path="StudentAttendanceSystem/SAtS_MVC_Client.csproj" />
+</Solution>
