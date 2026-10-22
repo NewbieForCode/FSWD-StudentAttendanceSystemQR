@@ -1,4 +1,4 @@
 <Solution>
   <Project Path="GRP5-StudentAttendanceSystem/SAtS_API.csproj" />
-  <Project Path="StudentAttendanceSystem/SAtS_MVC_Client.csproj" />
+  <Project Path="SAtS_MVC_Client/SAtS_MVC_Client.csproj" Id="1881e637-9764-494e-8097-85eb30c5cf37" />
 </Solution>
