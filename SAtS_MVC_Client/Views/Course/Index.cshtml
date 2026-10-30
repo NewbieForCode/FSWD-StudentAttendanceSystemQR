@@ -1,0 +1,22 @@
+﻿@model List<SAtS_MVC_Client.Models.Course>
+
+<h1> Course Records </h1>
+<h3> Current courses offered by the university.</h3>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Course ID</th>
+            <th>Course Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.CourseId</td>
+                <td>@course.CourseName</td>
+            </tr>
+        }
+    </tbody>
+</table>
