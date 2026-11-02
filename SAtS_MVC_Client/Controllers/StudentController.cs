@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SAtS_MVC_Client.Models;
 
 namespace SAtS_MVC_Client.Controllers
@@ -12,6 +13,7 @@ namespace SAtS_MVC_Client.Controllers
             _httpClient = httpClientFactory.CreateClient();
         }
 
+        [Authorize(Roles = "Admin, Teacher")]
         public async Task<IActionResult> Index()
         {
             var students = await _httpClient.GetFromJsonAsync<List<Student>>
