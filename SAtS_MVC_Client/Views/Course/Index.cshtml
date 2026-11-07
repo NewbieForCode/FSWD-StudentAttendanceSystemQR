@@ -1,4 +1,4 @@
-﻿@model List<SAtS_MVC_Client.Models.Course>
+﻿@model List<SAtS_MVC_Client.Models.CourseViewModel>
 
 <h1> Course Records </h1>
 <h3> Current courses offered by the university.</h3>
@@ -11,12 +11,43 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var course in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@course.CourseId</td>
-                <td>@course.CourseName</td>
+                <td>@item.Course.CourseId</td>
+                <td>@item.Course.CourseName</td>
             </tr>
         }
     </tbody>
 </table>
+
+
+<br /> <br />
+<h1> Course Sessions </h1>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Course ID</th>
+            <th>Session ID</th>
+            <th>Session Date</th>
+            <th>QR Token</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @foreach (var session in item.Sessions)
+            {
+                <tr>
+                    <td>@session.CourseId</td>
+                    <td>@session.CSessionId</td>
+                    <td>@session.CSessionDate</td>
+                    <td>@session.CSessionQrtoken</td>
+                </tr>
+            }
+        }
+        
+    </tbody>
+</table>
+
