@@ -15,6 +15,18 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+//------------------------------------------------------------
+//Register the Google sign-in service
+builder.Services.AddAuthentication().AddGoogle(options =>
+{
+    //Read the Google Client ID
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+
+    //Read the Google Client Secret
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+});
+//------------------------------------------------------------
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
