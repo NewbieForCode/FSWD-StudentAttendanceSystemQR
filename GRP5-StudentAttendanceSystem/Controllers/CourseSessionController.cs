@@ -9,10 +9,12 @@ namespace GRP5_StudentAttendanceSystem.Controllers
     public class CourseSessionController : Controller
     {
         private readonly SAtS_Context _context;
+        private readonly HttpClient _httpClient;
 
-        public CourseSessionController(SAtS_Context context)
+        public CourseSessionController(SAtS_Context context, IHttpClientFactory httpClientFactory)
         {
             _context = context;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         [HttpGet]
@@ -22,5 +24,34 @@ namespace GRP5_StudentAttendanceSystem.Controllers
 
             return Ok(coursesession);
         }
+
+
+        [HttpGet("{id}/qrcode")]
+        public async Task<IActionResult> GenerateQRCode(int id)
+        {
+            var session = await _context.TblCourseSessions.FirstOrDefaultAsync(s => s.CSessionId == id);
+
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+
+            string qrContent = session.CSessionQrtoken;
+            string qrUrl = $"http://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(qrContent)}";
+            //http(s)://api.qrserver.com/v1/create-qr-code/?data=[URL-encoded-text]&size=[pixels]x[pixels]
+            //http://api.qrserver.com/v1/create-qr-code/?data=HelloWorld!&size=100x100
+
+
+
+
+            var imageBytes = await _httpClient.GetByteArrayAsync(qrUrl);
+
+            return File(imageBytes, "image/png");
+
+        }
+
+
+
     }
 }
