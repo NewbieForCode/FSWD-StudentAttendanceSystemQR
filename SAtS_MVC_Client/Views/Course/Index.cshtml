@@ -72,11 +72,15 @@
         {
             @foreach (var session in item.Sessions)
             {
+                // Testing QR Code gen for the sessions 
+                string qrContent = $"https://localhost:7147/api/CourseSession/{session.CSessionId}/qrcode";
+                string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(qrContent)}";
                 <tr>
                     <td>@session.CourseId</td>
                     <td>@session.CSessionId</td>
                     <td>@session.CSessionDate</td>
                     <td>@session.CSessionQrtoken</td>
+                    <td><img src="@qrUrl" alt="QR Code" width="30" height="30" /></td>
                 </tr>
             }
         }

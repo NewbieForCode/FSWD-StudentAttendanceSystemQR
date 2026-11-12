@@ -14,7 +14,7 @@ builder.Services.AddDbContext<SAtS_Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
 ));
 
-
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
