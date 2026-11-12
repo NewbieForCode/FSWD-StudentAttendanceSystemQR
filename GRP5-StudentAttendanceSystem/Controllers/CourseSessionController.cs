@@ -25,6 +25,44 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             return Ok(coursesession);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSession(int id, [FromBody] TblCourseSession session)
+        {
+            var existingSession = await _context.TblCourseSessions
+                .FindAsync(id);
+
+            if (existingSession == null)
+            {
+                return NotFound();
+            }
+
+            existingSession.CSessionDate = session.CSessionDate;
+            existingSession.CSessionQrtoken = session.CSessionQrtoken;
+            existingSession.CourseId = session.CourseId;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSession(int id)
+        {
+            var session = await _context.TblCourseSessions
+                .FindAsync(id);
+
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            _context.TblCourseSessions.Remove(session);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
 
         [HttpGet("{id}/qrcode")]
         public async Task<IActionResult> GenerateQRCode(int id)
