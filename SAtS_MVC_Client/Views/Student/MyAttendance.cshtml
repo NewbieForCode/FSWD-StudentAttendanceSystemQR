@@ -1,0 +1,57 @@
+﻿@model SAtS_MVC_Client.Models.MyAttendanceViewModel
+
+@{
+    // Caleb McIntyre - 12/11/2026
+    // A student's own attendance report, one row per course
+    ViewData["Title"] = "My Attendance";
+}
+
+<h1> My Attendance </h1>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-warning"> @ViewBag.Message </div>
+}
+else
+{
+    <h4> @Model.StudentName </h4>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title"> Overall attendance: @Model.OverallPercentage% </h5>
+            <p class="card-text"> You've attended @Model.AttendedSessions of @Model.TotalSessions sessions. </p>
+        </div>
+    </div>
+
+    @if (Model.Courses.Count == 0)
+    {
+        <p> There are no course sessions yet. </p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th> Course </th>
+                    <th> Attended </th>
+                    <th> Attendance </th>
+                </tr>
+                @foreach (var course in Model.Courses)
+                {
+                    var barColour = course.Percentage >= 80 ? "bg-success"
+                                  : course.Percentage >= 50 ? "bg-warning"
+                                  : "bg-danger";
+                    <tr>
+                        <td> @course.CourseId - @course.CourseName </td>
+                        <td> @course.AttendedSessions / @course.TotalSessions </td>
+                        <td style="min-width: 150px;">
+                            <div class="progress" role="progressbar" aria-valuenow="@course.Percentage" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar @barColour" style="width: @course.Percentage%"> @course.Percentage% </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+}

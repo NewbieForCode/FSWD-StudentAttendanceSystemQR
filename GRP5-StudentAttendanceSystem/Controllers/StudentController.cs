@@ -24,6 +24,7 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             return Ok(students);
         }
 
+        // Caleb McIntyre - 11/11/2026
         // GET api/Student/ByEmail?email=someone@example.com
         // Returns the one student whose email matches, or 404 if there isn't one
         [HttpGet("ByEmail")]

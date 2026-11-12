@@ -1,13 +1,39 @@
 ﻿@model List<SAtS_MVC_Client.Models.Course>
 
+@{
+    // Caleb McIntyre - 12/11/2026: Admins see Add, Edit and Delete buttons
+    ViewData["Title"] = "Course Records";
+    var isAdmin = User.IsInRole("Admin");
+}
+
 <h1> Course Records </h1>
 <h3> Current courses offered by the university.</h3>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success"> @TempData["Message"] </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger"> @TempData["Error"] </div>
+}
+
+@if (isAdmin)
+{
+    <p>
+        <a class="btn btn-primary" asp-action="Create">Add Course</a>
+    </p>
+}
 
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>Course ID</th>
             <th>Course Name</th>
+            @if (isAdmin)
+            {
+                <th></th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -16,6 +42,13 @@
             <tr>
                 <td>@course.CourseId</td>
                 <td>@course.CourseName</td>
+                @if (isAdmin)
+                {
+                    <td>
+                        <a class="btn btn-secondary btn-sm" asp-action="Edit" asp-route-id="@course.CourseId">Edit</a>
+                        <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@course.CourseId">Delete</a>
+                    </td>
+                }
             </tr>
         }
     </tbody>
