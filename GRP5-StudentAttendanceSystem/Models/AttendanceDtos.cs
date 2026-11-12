@@ -33,6 +33,23 @@
         public string Token { get; set; } = "";
     }
 
+    //What the MVC client sends to create a new course session
+    public class CreateSessionDto
+    {
+        public string CourseId { get; set; } = "";
+        public DateOnly SessionDate { get; set; }
+    }
+
+    //One student who checked in to a session
+    public class AttendanceRecordDto
+    {
+        public int AttendanceId { get; set; }
+        public int StudentId { get; set; }
+        public string StudentName { get; set; } = "";
+        public string StudentEmail { get; set; } = "";
+        public DateTime TimeOfScan { get; set; }
+    }
+
     //The answer the API gives back after a check-in attempt
     public class CheckInResultDto
     {

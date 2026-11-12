@@ -7,6 +7,11 @@
     ViewData["Title"] = "Check-in QR Code";
 }
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success"> @TempData["Message"] </div>
+}
+
 <div class="text-center">
     <h1> @Model.Session.CourseId - @Model.Session.CourseName </h1>
     <h3> Session on @Model.Session.CSessionDate.ToString("dd/MM/yyyy") </h3>
@@ -20,5 +25,6 @@
 
     <p> Students checked in so far: <strong>@Model.Session.CheckedInCount</strong> </p>
 
+    <a class="btn btn-primary" asp-action="SessionAttendance" asp-route-id="@Model.Session.CSessionId">View Attendance</a>
     <a class="btn btn-secondary" asp-action="Sessions">Back to sessions</a>
 </div>

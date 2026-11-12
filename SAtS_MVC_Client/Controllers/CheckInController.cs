@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SAtS_MVC_Client.Models;
 
 namespace SAtS_MVC_Client.Controllers
@@ -65,6 +66,110 @@ namespace SAtS_MVC_Client.Controllers
 
             return View(model);
         }
+
+        //------------------------------------------------------------
+        // Caleb McIntyre - 12/11/2026
+        // Create a course session, and view who attended a session
+        //------------------------------------------------------------
+
+        //GET: /CheckIn/CreateSession
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> CreateSession()
+        {
+            var model = new CreateSessionViewModel();
+            model.Courses = await GetCourseOptions();
+            return View(model);
+        }
+
+        //POST: /CheckIn/CreateSession
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> CreateSession(CreateSessionViewModel model)
+        {
+            //Server-side validation: the date can't be in the past
+            if (model.SessionDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                ModelState.AddModelError(nameof(model.SessionDate), "The session date can't be in the past.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Courses = await GetCourseOptions();
+                return View(model);
+            }
+
+            var response = await _httpClient.PostAsJsonAsync(ApiBaseUrl + "StudentAttendance/Session",
+                new { CourseId = model.CourseId, SessionDate = model.SessionDate });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, await ReadApiMessage(response));
+                model.Courses = await GetCourseOptions();
+                return View(model);
+            }
+
+            var session = await response.Content.ReadFromJsonAsync<SessionInfo>();
+            TempData["Message"] = "Session created.";
+
+            //Go straight to the new session's QR code
+            return RedirectToAction(nameof(ShowQr), new { id = session?.CSessionId });
+        }
+
+        //GET: /CheckIn/SessionAttendance/5
+        //The students who checked in to one session
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> SessionAttendance(int id)
+        {
+            var sessionResponse = await _httpClient.GetAsync(ApiBaseUrl + "StudentAttendance/Session/" + id);
+            if (!sessionResponse.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var session = await sessionResponse.Content.ReadFromJsonAsync<SessionInfo>();
+            var records = await _httpClient.GetFromJsonAsync<List<AttendanceRecordRow>>
+                (ApiBaseUrl + "StudentAttendance/Session/" + id + "/Records");
+
+            var model = new SessionAttendanceViewModel
+            {
+                Session = session ?? new SessionInfo(),
+                Records = records ?? new List<AttendanceRecordRow>()
+            };
+
+            return View(model);
+        }
+
+        //The courses for the Create Session drop-down
+        private async Task<List<SelectListItem>> GetCourseOptions()
+        {
+            var courses = await _httpClient.GetFromJsonAsync<List<Course>>(ApiBaseUrl + "Course") ?? new List<Course>();
+
+            return courses
+                .OrderBy(c => c.CourseId)
+                .Select(c => new SelectListItem { Value = c.CourseId, Text = c.CourseId + " - " + c.CourseName })
+                .ToList();
+        }
+
+        //Reads the "message" the API sends back when something fails
+        private static async Task<string> ReadApiMessage(HttpResponseMessage response)
+        {
+            try
+            {
+                var body = await response.Content.ReadFromJsonAsync<CheckInResult>();
+                if (!string.IsNullOrWhiteSpace(body?.Message))
+                {
+                    return body.Message;
+                }
+            }
+            catch
+            {
+                //The response wasn't JSON, so fall through to the general message
+            }
+
+            return "Something went wrong. Please try again.";
+        }
+        //------------------------------------------------------------
 
         //GET: /CheckIn?token=abc
         //The page a student lands on after scanning the QR code

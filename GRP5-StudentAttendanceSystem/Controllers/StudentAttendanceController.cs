@@ -158,6 +158,84 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             return Ok(new CheckInResultDto { Success = true, Message = "You're checked in. Thanks!" });
         }
 
+        //------------------------------------------------------------
+        // Caleb McIntyre - 12/11/2026
+        // Create a course session, and list who attended a session
+        //------------------------------------------------------------
+
+        // POST api/StudentAttendance/Session
+        // Body: { "courseId": "FS101", "sessionDate": "2026-11-12" }
+        // Creates a session with a new random QR token
+        [HttpPost("Session")]
+        public async Task<IActionResult> CreateSession([FromBody] CreateSessionDto request)
+        {
+            var courseExists = await _context.TblCourses.AnyAsync(c => c.CourseId == request.CourseId);
+            if (!courseExists)
+            {
+                return NotFound(new { message = "That course doesn't exist." });
+            }
+
+            //Sessions can't be created in the past
+            if (request.SessionDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                return BadRequest(new { message = "The session date can't be in the past." });
+            }
+
+            //Only one session per course per day
+            var duplicate = await _context.TblCourseSessions
+                .AnyAsync(s => s.CourseId == request.CourseId && s.CSessionDate == request.SessionDate);
+            if (duplicate)
+            {
+                return Conflict(new { message = $"{request.CourseId} already has a session on {request.SessionDate:dd/MM/yyyy}." });
+            }
+
+            //cSessionID isn't auto-numbered in the database, so use the next number
+            var nextId = (await _context.TblCourseSessions.MaxAsync(s => (int?)s.CSessionId) ?? 0) + 1;
+
+            _context.TblCourseSessions.Add(new TblCourseSession
+            {
+                CSessionId = nextId,
+                CourseId = request.CourseId,
+                CSessionDate = request.SessionDate,
+                //A random, hard-to-guess token for the QR code
+                CSessionQrtoken = Guid.NewGuid().ToString("N")
+            });
+            await _context.SaveChangesAsync();
+
+            var created = await FindSessionInfo(s => s.CSessionId == nextId);
+            return Ok(created);
+        }
+
+        // GET api/StudentAttendance/Session/5/Records
+        // Every student who checked in to a session, earliest first
+        // (JOIN attendance records -> students)
+        [HttpGet("Session/{id}/Records")]
+        public async Task<IActionResult> GetSessionRecords(int id)
+        {
+            var sessionExists = await _context.TblCourseSessions.AnyAsync(s => s.CSessionId == id);
+            if (!sessionExists)
+            {
+                return NotFound(new { message = "That session doesn't exist." });
+            }
+
+            var records = await (
+                from record in _context.TblAttendanceRecords
+                join student in _context.TblStudentDetails
+                    on record.StudentId equals student.StudentId
+                where record.CSessionId == id
+                orderby record.AttendanceTimeOfScan
+                select new AttendanceRecordDto
+                {
+                    AttendanceId = record.AttendanceId,
+                    StudentId = student.StudentId,
+                    StudentName = student.StudentFname + " " + student.StudentLname,
+                    StudentEmail = student.StudentEmail,
+                    TimeOfScan = record.AttendanceTimeOfScan
+                }).ToListAsync();
+
+            return Ok(records);
+        }
+
         //Finds one session (with its course name and check-in count) using the given condition
         private async Task<SessionInfoDto?> FindSessionInfo(System.Linq.Expressions.Expression<Func<TblCourseSession, bool>> condition)
         {

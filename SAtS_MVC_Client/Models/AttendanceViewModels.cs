@@ -1,4 +1,7 @@
-﻿namespace SAtS_MVC_Client.Models
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace SAtS_MVC_Client.Models
 {
     //------------------------------------------------------------
     // Caleb McIntyre - 12/11/2026
@@ -51,6 +54,44 @@
 
         //The QR code image, made by the external goQR.me API
         public string QrImageUrl { get; set; } = "";
+    }
+
+    //------------------------------------------------------------
+    // Caleb McIntyre - 12/11/2026
+    // Create Session form and the session attendance list
+    //------------------------------------------------------------
+
+    //The Create Session form
+    public class CreateSessionViewModel
+    {
+        [Required(ErrorMessage = "Please pick a course.")]
+        [Display(Name = "Course")]
+        public string CourseId { get; set; } = "";
+
+        [Required(ErrorMessage = "Please pick a date.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Session date")]
+        public DateOnly SessionDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+        //The options for the course drop-down
+        public List<SelectListItem> Courses { get; set; } = new List<SelectListItem>();
+    }
+
+    //One student who checked in to a session
+    public class AttendanceRecordRow
+    {
+        public int AttendanceId { get; set; }
+        public int StudentId { get; set; }
+        public string StudentName { get; set; } = "";
+        public string StudentEmail { get; set; } = "";
+        public DateTime TimeOfScan { get; set; }
+    }
+
+    //The page listing who attended one session
+    public class SessionAttendanceViewModel
+    {
+        public SessionInfo Session { get; set; } = new SessionInfo();
+        public List<AttendanceRecordRow> Records { get; set; } = new List<AttendanceRecordRow>();
     }
 
     //The answer the API gives after a check-in attempt

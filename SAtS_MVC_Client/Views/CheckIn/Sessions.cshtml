@@ -3,12 +3,17 @@
 @{
     // Caleb McIntyre - 12/11/2026
     // Teacher page: pick a session to show its check-in QR code
-    ViewData["Title"] = "Session QR Codes";
+    ViewData["Title"] = "Course Sessions";
     var today = DateOnly.FromDateTime(DateTime.Now);
 }
 
-<h1> Session QR Codes </h1>
-<h3> Pick a session to show its check-in QR code. </h3>
+<h1> Course Sessions </h1>
+<h3> Show a session's check-in QR code, or see who attended. </h3>
+
+@* Caleb McIntyre - 12/11/2026: Create Session button *@
+<p>
+    <a class="btn btn-success" asp-action="CreateSession">Create Session</a>
+</p>
 
 @if (Model.Count == 0)
 {
@@ -38,6 +43,7 @@ else
                     <td> @session.CheckedInCount </td>
                     <td>
                         <a class="btn btn-primary btn-sm" asp-action="ShowQr" asp-route-id="@session.CSessionId">Show QR Code</a>
+                        <a class="btn btn-secondary btn-sm" asp-action="SessionAttendance" asp-route-id="@session.CSessionId">View Attendance</a>
                     </td>
                 </tr>
             }
