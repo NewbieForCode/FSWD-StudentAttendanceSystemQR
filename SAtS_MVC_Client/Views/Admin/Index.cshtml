@@ -1,0 +1,61 @@
+﻿@model List<SAtS_MVC_Client.Models.AdminUserViewModel>
+
+@{
+    // Caleb McIntyre - 12/11/2026
+    // Admin page: list of user accounts and their roles
+    ViewData["Title"] = "Admin - Users";
+}
+
+<h1> Admin </h1>
+
+<div class="mb-4">
+    <h5> Manage content </h5>
+    <a class="btn btn-outline-secondary btn-sm" asp-controller="Student" asp-action="Index">Student Records</a>
+    <a class="btn btn-outline-secondary btn-sm" asp-controller="Course" asp-action="Index">Course Records</a>
+    <a class="btn btn-outline-secondary btn-sm" asp-controller="CheckIn" asp-action="Sessions">Course Sessions</a>
+</div>
+
+<h3> User Accounts </h3>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success"> @TempData["Message"] </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger"> @TempData["Error"] </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th> Email </th>
+            <th> Full Name </th>
+            <th> Confirmed </th>
+            <th> Roles </th>
+            <th></th>
+        </tr>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td> @user.Email </td>
+                <td> @user.FullName </td>
+                <td> @(user.EmailConfirmed ? "Yes" : "No") </td>
+                <td>
+                    @if (user.Roles.Count == 0)
+                    {
+                        <span class="text-muted">None</span>
+                    }
+                    @foreach (var role in user.Roles)
+                    {
+                        <span class="badge bg-secondary"> @role </span>
+                    }
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm" asp-action="ManageRoles" asp-route-id="@user.Id">Edit Roles</a>
+                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@user.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>

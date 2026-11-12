@@ -1,0 +1,49 @@
+﻿@model SAtS_MVC_Client.Models.Student
+
+@{
+    // Caleb McIntyre - 11/11/2026
+    // A signed-in student's own student record
+    ViewData["Title"] = "My Record";
+}
+
+<h1> My Student Record </h1>
+
+@if (Model == null)
+{
+    <div class="alert alert-warning"> @ViewBag.Message </div>
+}
+else
+{
+    <h3> @Model.StudentFName @Model.StudentLName </h3>
+
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th> Student ID </th>
+            <td> @Model.StudentId </td>
+        </tr>
+        <tr>
+            <th> First Name </th>
+            <td> @Model.StudentFName </td>
+        </tr>
+        <tr>
+            <th> Last Name </th>
+            <td> @Model.StudentLName </td>
+        </tr>
+        <tr>
+            <th> Date of Birth </th>
+            <td> @Model.StudentDob </td>
+        </tr>
+        <tr>
+            <th> Address </th>
+            <td> @Model.StudentStreetAddress, @Model.StudentSuburb, @Model.StudentCity, @Model.StudentPostalCode </td>
+        </tr>
+        <tr>
+            <th> Email </th>
+            <td> @Model.StudentEmail </td>
+        </tr>
+        <tr>
+            <th> Phone </th>
+            <td> @Model.StudentPhone </td>
+        </tr>
+    </table>
+}

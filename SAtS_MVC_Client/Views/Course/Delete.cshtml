@@ -1,0 +1,24 @@
+﻿@model SAtS_MVC_Client.Models.Course
+
+@{
+    // Caleb McIntyre - 12/11/2026: Admin page to confirm deleting a course
+    ViewData["Title"] = "Delete Course";
+}
+
+<h1> Delete Course </h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this course? This can't be undone.
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3"> Course ID </dt>
+    <dd class="col-sm-9"> @Model.CourseId </dd>
+    <dt class="col-sm-3"> Course Name </dt>
+    <dd class="col-sm-9"> @Model.CourseName </dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.CourseId" method="post">
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+</form>

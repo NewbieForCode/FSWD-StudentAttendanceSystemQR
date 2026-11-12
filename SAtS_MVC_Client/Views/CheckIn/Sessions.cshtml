@@ -1,0 +1,52 @@
+﻿@model List<SAtS_MVC_Client.Models.SessionInfo>
+
+@{
+    // Caleb McIntyre - 12/11/2026
+    // Teacher page: pick a session to show its check-in QR code
+    ViewData["Title"] = "Course Sessions";
+    var today = DateOnly.FromDateTime(DateTime.Now);
+}
+
+<h1> Course Sessions </h1>
+<h3> Show a session's check-in QR code, or see who attended. </h3>
+
+@* Caleb McIntyre - 12/11/2026: Create Session button *@
+<p>
+    <a class="btn btn-success" asp-action="CreateSession">Create Session</a>
+</p>
+
+@if (Model.Count == 0)
+{
+    <p> There are no course sessions yet. </p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th> Date </th>
+                <th> Course </th>
+                <th> Checked In </th>
+                <th></th>
+            </tr>
+            @foreach (var session in Model)
+            {
+                <tr class="@(session.CSessionDate == today ? "table-success" : "")">
+                    <td>
+                        @session.CSessionDate.ToString("dd/MM/yyyy")
+                        @if (session.CSessionDate == today)
+                        {
+                            <span class="badge bg-success">Today</span>
+                        }
+                    </td>
+                    <td> @session.CourseId - @session.CourseName </td>
+                    <td> @session.CheckedInCount </td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" asp-action="ShowQr" asp-route-id="@session.CSessionId">Show QR Code</a>
+                        <a class="btn btn-secondary btn-sm" asp-action="SessionAttendance" asp-route-id="@session.CSessionId">View Attendance</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+}

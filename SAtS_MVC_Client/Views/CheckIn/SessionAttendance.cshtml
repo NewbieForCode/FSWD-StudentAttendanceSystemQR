@@ -1,0 +1,42 @@
+﻿@model SAtS_MVC_Client.Models.SessionAttendanceViewModel
+
+@{
+    // Caleb McIntyre - 12/11/2026
+    // Teacher/Admin page: the students who checked in to one session
+    ViewData["Title"] = "Session Attendance";
+}
+
+<h1> Session Attendance </h1>
+<h4> @Model.Session.CourseId - @Model.Session.CourseName, @Model.Session.CSessionDate.ToString("dd/MM/yyyy") </h4>
+
+<p> Students checked in: <strong>@Model.Records.Count</strong> </p>
+
+@if (Model.Records.Count == 0)
+{
+    <p class="text-muted"> No one has checked in to this session yet. </p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th> Student ID </th>
+                <th> Name </th>
+                <th> Email </th>
+                <th> Checked in at </th>
+            </tr>
+            @foreach (var record in Model.Records)
+            {
+                <tr>
+                    <td> @record.StudentId </td>
+                    <td> @record.StudentName </td>
+                    <td> @record.StudentEmail </td>
+                    <td> @record.TimeOfScan.ToString("h:mm tt") </td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+
+<a class="btn btn-primary" asp-action="ShowQr" asp-route-id="@Model.Session.CSessionId">Show QR Code</a>
+<a class="btn btn-secondary" asp-action="Sessions">Back to sessions</a>

@@ -24,6 +24,23 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             return Ok(students);
         }
 
+        // Caleb McIntyre - 11/11/2026
+        // GET api/Student/ByEmail?email=someone@example.com
+        // Returns the one student whose email matches, or 404 if there isn't one
+        [HttpGet("ByEmail")]
+        public async Task<IActionResult> GetByEmail([FromQuery] string email)
+        {
+            var student = await _context.TblStudentDetails
+                .FirstOrDefaultAsync(s => s.StudentEmail == email);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(student);
+        }
+
 
     }
 }

@@ -1,0 +1,72 @@
+﻿@model SAtS_MVC_Client.Models.SessionInfo
+
+@{
+    // Caleb McIntyre - 12/11/2026
+    // Student check-in page (opened by scanning a session's QR code).
+    // The "Check in" button sends the request with AJAX, so the page
+    // doesn't reload, and shows a success or error message.
+    ViewData["Title"] = "Check In";
+}
+
+<h1> Check In </h1>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-warning"> @ViewBag.Message </div>
+}
+else
+{
+    <div class="card" style="max-width: 32rem;">
+        <div class="card-body">
+            <h4 class="card-title"> @Model.CourseId - @Model.CourseName </h4>
+            <p class="card-text"> Session on @Model.CSessionDate.ToString("dd/MM/yyyy") </p>
+
+            <form id="checkInForm" asp-action="Submit" method="post">
+                <input type="hidden" name="token" value="@Model.CSessionQrToken" />
+                <button id="checkInButton" type="submit" class="btn btn-success btn-lg w-100">Check in</button>
+            </form>
+
+            <div id="checkInMessage" class="alert mt-3 d-none" role="alert"></div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Caleb McIntyre - 12/11/2026
+        // Send the check-in with AJAX and show the result without reloading the page
+        $(function () {
+            $("#checkInForm").on("submit", function (e) {
+                e.preventDefault();
+
+                var $button = $("#checkInButton");
+                var $message = $("#checkInMessage");
+
+                //Show that something is happening and stop double clicks
+                $button.prop("disabled", true).text("Checking in...");
+                $message.addClass("d-none").removeClass("alert-success alert-danger");
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    type: "POST",
+                    data: $(this).serialize(),   // includes the token and the anti-forgery token
+                    dataType: "json"
+                })
+                .done(function (result) {
+                    //Success: show the message and keep the button disabled
+                    $message.addClass("alert-success").text(result.message).removeClass("d-none");
+                    $button.text("Checked in");
+                })
+                .fail(function (xhr) {
+                    //Failure: show the reason from the server, or a general message
+                    var text = "Couldn't check in. Please check your connection and try again.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        text = xhr.responseJSON.message;
+                    }
+                    $message.addClass("alert-danger").text(text).removeClass("d-none");
+                    $button.prop("disabled", false).text("Check in");
+                });
+            });
+        });
+    </script>
+}
