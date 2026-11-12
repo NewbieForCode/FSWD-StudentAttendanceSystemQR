@@ -24,6 +24,69 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             return Ok(students);
         }
 
+
+        //-----Create, Edit, Delete
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStudent(int id)
+        {
+            var student = await _context.TblStudentDetails.FindAsync(id);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(student);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStudent([FromBody] TblStudentDetail student)
+        {
+            var currentLgeId = await _context.TblStudentDetails.Select(s => (int?)s.StudentId).MaxAsync() ?? 0;
+
+            student.StudentId = currentLgeId + 1;
+
+            _context.TblStudentDetails.Add(student);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetStudent), new { id = student.StudentId }, student);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateStudent(int id, [FromBody] TblStudentDetail student)
+        {
+            var studentChange = await _context.TblStudentDetails.FindAsync(id);
+            if (studentChange == null)
+            {
+                return NotFound();
+            }
+
+            // Update the student properties
+            studentChange.StudentFname = student.StudentFname;
+            studentChange.StudentLname = student.StudentLname;
+            studentChange.StudentPhone = student.StudentPhone;
+            studentChange.StudentEmail = student.StudentEmail;
+
+            studentChange.StudentStreetAddress = student.StudentStreetAddress;
+            studentChange.StudentSuburb = student.StudentSuburb;
+            studentChange.StudentCity = student.StudentCity;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            var student = await _context.TblStudentDetails.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            _context.TblStudentDetails.Remove(student);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
         // Caleb McIntyre - 11/11/2026
         // GET api/Student/ByEmail?email=someone@example.com
         // Returns the one student whose email matches, or 404 if there isn't one
