@@ -95,6 +95,13 @@
                     <td>@session.CSessionDate</td>
                     <td>@session.CSessionQrtoken</td>
                     <td><img src="@qrUrl" alt="QR Code" width="30" height="30" /></td>
+                    @if (isAdmin)
+                    {
+                        <td>
+                            <a class="btn btn-secondary btn-sm" asp-action="EditSession" asp-route-id="@session.CSessionId">Edit</a>
+                            <a class="btn btn-danger btn-sm" asp-action="DeleteSession" asp-route-id="@session.CSessionId">Delete</a>
+                        </td>
+                    }
                 </tr>
             }
         }

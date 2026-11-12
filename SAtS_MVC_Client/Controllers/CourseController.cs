@@ -53,6 +53,78 @@ namespace SAtS_MVC_Client.Controllers
             return View(viewModel);
         }
 
+
+        //---- Course Sessions, Edit and Delete
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditSession(int id)
+        {
+            var session = await _httpClient.GetFromJsonAsync<CourseSession>(
+                $"https://localhost:7147/api/CourseSession/{id}");
+
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            return View(session);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditSession(CourseSession session)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(session);
+            }
+
+            var response = await _httpClient.PutAsJsonAsync(
+                $"https://localhost:7147/api/CourseSession/{session.CSessionId}", session);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Message"] = "Course session updated";
+                return RedirectToAction("Index");
+            }
+            
+            
+            TempData["Error"] = "Failed to update course session";
+            return View(session);
+
+        }
+
+
+        //---- Delete course session
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteSession(int id)
+        {
+            var session = await _httpClient.GetFromJsonAsync<CourseSession>(
+                $"https://localhost:7147/api/CourseSession/{id}");
+            if (session == null)
+            {
+                return NotFound();
+            }
+            return View(session);
+        }
+
+        [HttpPost, ActionName("DeleteSession")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSessionConfirmed(int id)
+        {
+            var response = await _httpClient.DeleteAsync(
+                $"https://localhost:7147/api/CourseSession/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Message"] = "Course session deleted";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to delete course session";
+            }
+            return RedirectToAction("Index");
+        }
+
+
         //------------------------------------------------------------
         // Caleb McIntyre - 12/11/2026
         // Add, edit and delete courses. Only Admins can use these.
