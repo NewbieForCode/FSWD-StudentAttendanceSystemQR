@@ -1,4 +1,4 @@
-﻿@model List<SAtS_MVC_Client.Models.Course>
+﻿@model List<SAtS_MVC_Client.Models.CourseViewModel>
 
 @{
     // Caleb McIntyre - 12/11/2026: Admins see Add, Edit and Delete buttons
@@ -37,7 +37,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var course in Model)
+        @foreach (var item in Model)
         {
             <tr>
                 <td>@course.CourseId</td>
@@ -49,7 +49,39 @@
                         <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@course.CourseId">Delete</a>
                     </td>
                 }
+                
             </tr>
         }
     </tbody>
 </table>
+
+
+<br /> <br />
+<h1> Course Sessions </h1>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Course ID</th>
+            <th>Session ID</th>
+            <th>Session Date</th>
+            <th>QR Token</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @foreach (var session in item.Sessions)
+            {
+                <tr>
+                    <td>@session.CourseId</td>
+                    <td>@session.CSessionId</td>
+                    <td>@session.CSessionDate</td>
+                    <td>@session.CSessionQrtoken</td>
+                </tr>
+            }
+        }
+        
+    </tbody>
+</table>
+
