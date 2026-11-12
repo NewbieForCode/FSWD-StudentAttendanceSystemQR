@@ -25,6 +25,20 @@
     </p>
 }
 
+<!-- Filter -->
+<form asp-controller="Course" asp-action="Index" method="get">
+    <label for="courseFilter">Filter by ID:</label>
+
+    <select id="courseFilter" class="form-select">
+        <option value="">All Courses</option>
+
+        @foreach (var prefix in ViewBag.CoursePrefixes)
+        {
+            <option value="@prefix">@prefix</option>
+        }
+    </select>
+</form>
+
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
@@ -39,7 +53,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <tr class="course-row" data-course-id="@item.Course.CourseId">
                 <td>@item.Course.CourseId</td>
                 <td>@item.Course.CourseName</td>
                 @if (isAdmin)
@@ -75,7 +89,7 @@
                 // Testing QR Code gen for the sessions 
                 string qrContent = $"https://localhost:7147/api/CourseSession/{session.CSessionId}/qrcode";
                 string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(qrContent)}";
-                <tr>
+                <tr class="session-row" data-course-id="@session.CourseId">
                     <td>@session.CourseId</td>
                     <td>@session.CSessionId</td>
                     <td>@session.CSessionDate</td>
@@ -88,3 +102,29 @@
     </tbody>
 </table>
 
+<script>
+    document.getElementById("courseFilter").addEventListener("change", function () {
+
+        const selectedPrefix = this.value.toUpperCase();
+
+        
+        document.querySelectorAll(".course-row").forEach(row => {
+
+            const courseId = row.dataset.courseId.toUpperCase();
+            row.style.display =
+                selectedPrefix === "" || courseId.startsWith(selectedPrefix)
+                    ? ""
+                    : "none";
+        });
+
+        
+        document.querySelectorAll(".session-row").forEach(row => {
+
+            const courseId = row.dataset.courseId.toUpperCase();
+            row.style.display =
+                selectedPrefix === "" || courseId.startsWith(selectedPrefix)
+                    ? ""
+                    : "none";
+        });
+    });
+</script>

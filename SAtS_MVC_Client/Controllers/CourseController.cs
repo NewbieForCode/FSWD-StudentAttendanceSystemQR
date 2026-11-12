@@ -16,13 +16,13 @@ namespace SAtS_MVC_Client.Controllers
             _httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? courseFilter)
         {
             var course = await _httpClient.GetFromJsonAsync<List<Course>>
-                (CourseApiUrl);
+                (CourseApiUrl) ?? new List<Course>();
 
             var sessions = await _httpClient.GetFromJsonAsync<List<CourseSession>>
-                ("https://localhost:7147/api/CourseSession");
+                ("https://localhost:7147/api/CourseSession") ?? new List<CourseSession>();
 
             var viewModel = course.Select(course => new CourseViewModel
             {
@@ -34,6 +34,22 @@ namespace SAtS_MVC_Client.Controllers
 
             }).ToList();
 
+
+            //-- filter by ids
+            if (!string.IsNullOrWhiteSpace(courseFilter))
+            {
+                viewModel = viewModel.Where(item => item.Course.CourseId.Contains(courseFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            //-- add to filter with new ids
+            var coursePrefixes = course 
+                .Select(c => new string(c.CourseId.TakeWhile(char.IsLetter).ToArray()))
+                .Where(prefix => !string.IsNullOrEmpty(prefix))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(prefix => prefix)
+                .ToList();
+
+            ViewBag.CoursePrefixes = coursePrefixes;
             return View(viewModel);
         }
 

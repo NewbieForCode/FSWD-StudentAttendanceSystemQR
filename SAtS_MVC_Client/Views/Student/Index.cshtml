@@ -3,6 +3,17 @@
 <h1> Student Records </h1>
 <h3> Current enrolled students to the university.</h3>
 
+<div style="display:flex; align-items:center; gap:250px;">
+    <form id="searchForm" action="/Student/Index" method="get">
+        <input type="text" id="searchInput" name="searchInput" value="@Context.Request.Query["searchInput"]" style="width:300px" placeholder="Search..." />
+        <input type="submit" value="Search" />
+    </form>
+    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+    {
+        <a class="btn btn-primary" asp-action="Create">Add Student</a>
+    }
+</div>
+
 <table class="table table-bordered table-striped">
     <tr>
         <th> Student ID </th>
@@ -23,6 +34,13 @@
             <td> @student.StudentStreetAddress, @student.StudentSuburb, @student.StudentCity, @student.StudentPostalCode </td>
             <td> @student.StudentEmail </td>
             <td> @student.StudentPhone </td>
+            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+            {
+                <td>
+                    <a class="btn btn-secondary btn-sm" asp-action="Edit" asp-route-id="@student.StudentId">Edit</a>
+                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@student.StudentId">Delete</a>
+                </td>
+            }
         </tr>
     }
 </table>

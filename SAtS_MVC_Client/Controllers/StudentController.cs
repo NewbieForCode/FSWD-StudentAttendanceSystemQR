@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SAtS_MVC_Client.Models;
 
+using System;
+using System.Linq;
+using System.Net.Http.Json;
+
 namespace SAtS_MVC_Client.Controllers
 {
     public class StudentController : Controller
@@ -17,13 +21,128 @@ namespace SAtS_MVC_Client.Controllers
         }
 
         [Authorize(Roles = "Admin, Teacher")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchInput)
         {
             var students = await _httpClient.GetFromJsonAsync<List<Student>>
                 ("https://localhost:7147/api/Student");
 
-            return View(students);
+            if (!string.IsNullOrEmpty(searchInput))
+            {
+                students = students.Where(s =>
+                    s.StudentFName.Contains(searchInput, StringComparison.OrdinalIgnoreCase) ||
+                    s.StudentLName.Contains(searchInput, StringComparison.OrdinalIgnoreCase) ||
+                    s.StudentSuburb.Contains(searchInput, StringComparison.OrdinalIgnoreCase) ||
+                    s.StudentCity.Contains(searchInput, StringComparison.OrdinalIgnoreCase) 
+                ).ToList();
+            }
+
+            return View(students ?? new List<Student>());
         }
+
+        // Delete, Edit and Create new student records
+        //---Create new student record
+        [Authorize(Roles = "Admin, Teacher")]
+        public IActionResult Create()
+        {
+            return View(new Student());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> Create(Student student)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(student);
+            }
+
+            var response = await _httpClient.PostAsJsonAsync
+                ("https://localhost:7147/api/Student", student);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to create student.");
+                return View(student);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        //----Edit student record
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var student = await _httpClient.GetFromJsonAsync<Student>
+                ($"https://localhost:7147/api/Student/{id}");
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> Edit(int id, Student student)
+        {
+            if (id != student.StudentId)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(student);
+            }
+
+            var response = await _httpClient.PutAsJsonAsync
+                ($"https://localhost:7147/api/Student/{id}", student);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to update student.");
+                return View(student);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        //----Delete student record
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var student = await _httpClient.GetFromJsonAsync<Student>
+                ($"https://localhost:7147/api/Student/{id}");
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var response = await _httpClient.DeleteAsync
+                ($"https://localhost:7147/api/Student/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to delete student.");
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
         //------------------------------------------------------------
         // Caleb McIntyre - 11/11/2026
