@@ -84,7 +84,7 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             }
             _context.TblStudentDetails.Remove(student);
             await _context.SaveChangesAsync();
-            return NoContent();
+            return NoContent(); 
         }
 
         // Caleb McIntyre - 11/11/2026
