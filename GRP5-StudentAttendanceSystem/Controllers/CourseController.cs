@@ -39,7 +39,8 @@ namespace GRP5_StudentAttendanceSystem.Controllers
                 return NotFound(new { message = "That course doesn't exist." });
             }
 
-            return Ok(new { course.CourseId, course.CourseName });
+            // Fix: also send the teacher, so the Edit page can show the current one
+            return Ok(new { course.CourseId, course.CourseName, course.TeacherId });
         }
 
         // POST api/Course
@@ -54,6 +55,12 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             if (await _context.TblCourses.AnyAsync(c => c.CourseId == course.CourseId))
             {
                 return Conflict(new { message = $"A course with the ID {course.CourseId} already exists." });
+            }
+
+            // Fix: the teacher must exist (otherwise the database rejects the course)
+            if (!await _context.TblTeacherDetails.AnyAsync(t => t.TeacherId == course.TeacherId))
+            {
+                return BadRequest(new { message = "Please pick a teacher for this course." });
             }
 
             _context.TblCourses.Add(new TblCourse { CourseId = course.CourseId, CourseName = course.CourseName, TeacherId = course.TeacherId });
@@ -73,10 +80,16 @@ namespace GRP5_StudentAttendanceSystem.Controllers
                 return NotFound(new { message = "That course doesn't exist." });
             }
 
-            existing.CourseName = course.CourseName?.Trim() ?? "";
-            await _context.SaveChangesAsync();
+            // Fix: save the chosen teacher too (it was being ignored)
+            if (!await _context.TblTeacherDetails.AnyAsync(t => t.TeacherId == course.TeacherId))
+            {
+                return BadRequest(new { message = "Please pick a teacher for this course." });
+            }
 
-            return Ok(new { existing.CourseId, existing.CourseName });
+            existing.CourseName = course.CourseName?.Trim() ?? "";
+            existing.TeacherId = course.TeacherId;
+            await _context.SaveChangesAsync();
+            return Ok(new { existing.CourseId, existing.CourseName, existing.TeacherId });
         }
 
         // DELETE api/Course/FS101

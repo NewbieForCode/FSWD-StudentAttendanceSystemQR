@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using GRP5_StudentAttendanceSystem.Models;
-
+using GRP5_StudentAttendanceSystem.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,6 +16,9 @@ builder.Services.AddDbContext<SAtS_Context>(options =>
 
 builder.Services.AddHttpClient();
 
+// Caleb McIntyre - 13/11/2026: NZ public holidays from the Nager.Date API (cached)
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<PublicHolidayService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

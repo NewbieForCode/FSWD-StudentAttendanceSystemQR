@@ -1,29 +1,54 @@
 ﻿@model List<SAtS_MVC_Client.Models.Student>
 
-<h1> Student Records </h1>
-<h3> Current enrolled students to the university.</h3>
+@* Caleb McIntyre - 13/11/2026: heading and table box match the home page *@
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Records</p>
+    <h1>Student Records</h1>
+    <h3> Current enrolled students to the university.</h3>
+</div>
 
-<div style="display:flex; align-items:center; gap:250px;">
-    <form id="searchForm" action="/Student/Index" method="get">
-        <input type="text" id="searchInput" name="searchInput" value="@Context.Request.Query["searchInput"]" style="width:300px" placeholder="Search..." />
-        <input type="submit" value="Search" />
-    </form>
+@* Fix: show the result of a delete *@
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success"> @TempData["Message"] </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger"> @TempData["Error"] </div>
+}
+
+
+@* Caleb McIntyre - 13/11/2026: Add Student first, then the search; table matches Teacher Records *@
+<div class="d-flex flex-wrap align-items-center gap-3 mb-3">
     @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
     {
         <a class="btn btn-primary" asp-action="Create">Add Student</a>
     }
+    <form id="searchForm" action="/Student/Index" method="get" class="d-flex gap-2" role="search">
+        <label for="searchInput" class="visually-hidden">Search students</label>
+        <input type="text" id="searchInput" name="searchInput" value="@Context.Request.Query["searchInput"]" class="form-control" style="width:300px; max-width:100%;" placeholder="Search by name, suburb or city..." />
+        <button type="submit" class="btn btn-outline-dark">Search</button>
+    </form>
 </div>
 
+<div class="table-responsive sats-table-wrap">
 <table class="table table-bordered table-striped">
-    <tr>
-        <th> Student ID </th>
-        <th> First Name </th>
-        <th> Last Name </th>
-        <th> Date of Birth </th>
-        <th> Address </th>
-        <th> Email </th>
-        <th> Phone </th>
-    </tr>
+    <thead>
+        <tr>
+            <th> Student ID </th>
+            <th> First Name </th>
+            <th> Last Name </th>
+            <th> Date of Birth </th>
+            <th> Address </th>
+            <th> Email </th>
+            <th> Phone </th>
+            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+            {
+                <th> Actions </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
     @foreach (var student in Model)
     {
         <tr>
@@ -36,11 +61,13 @@
             <td> @student.StudentPhone </td>
             @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
             {
-                <td>
+                <td class="text-nowrap">
                     <a class="btn btn-secondary btn-sm" asp-action="Edit" asp-route-id="@student.StudentId">Edit</a>
                     <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@student.StudentId">Delete</a>
                 </td>
             }
         </tr>
     }
+    </tbody>
 </table>
+</div>

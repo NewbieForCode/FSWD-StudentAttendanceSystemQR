@@ -1,0 +1,62 @@
+﻿@model SAtS_MVC_Client.Models.EditSessionViewModel
+
+@{
+    // Caleb McIntyre - 13/11/2026
+    // Admin/Teacher page to change a session's course or date
+    // Caleb McIntyre - 13/11/2026: restyled to match the home page
+    ViewData["Title"] = "Edit Session";
+}
+
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Course Sessions</p>
+    <h1>Edit Session</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="EditSession" asp-route-id="@Model.CSessionId" method="post" class="sats-form-card">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <input type="hidden" asp-for="CSessionId" />
+            <input type="hidden" name="OriginalDate" value="@Model.OriginalDate.ToString("yyyy-MM-dd")" />
+            <input type="hidden" asp-for="QrToken" />
+
+            <div class="mb-3">
+                <label class="form-label">Session ID</label>
+                <input class="form-control" value="@Model.CSessionId" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CourseId" class="form-label"></label>
+                <select asp-for="CourseId" asp-items="Model.Courses" class="form-select">
+                    <option value="">-- Pick a course --</option>
+                </select>
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SessionDate" class="form-label"></label>
+                <input asp-for="SessionDate" class="form-control" />
+                <span asp-validation-for="SessionDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">QR Token</label>
+                <input class="form-control font-monospace" value="@Model.QrToken" readonly />
+                <div class="form-text">The QR token can't be changed, so printed or shared QR codes keep working.</div>
+            </div>
+
+            <div class="sats-form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a class="btn btn-secondary" asp-action="Sessions">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-5 offset-md-1 mt-4 mt-md-0">
+        <partial name="_HolidayPanel" model="Model.Holidays" />
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

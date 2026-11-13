@@ -3,10 +3,18 @@
 @{
     // Caleb McIntyre - 12/11/2026
     // A student's own attendance report, one row per course
+    // Caleb McIntyre - 13/11/2026: restyled as cards to match the home page
     ViewData["Title"] = "My Attendance";
 }
 
-<h1> My Attendance </h1>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Student</p>
+    <h1>My Attendance</h1>
+    @if (ViewBag.Message == null)
+    {
+        <h3>@Model.StudentName</h3>
+    }
+</div>
 
 @if (ViewBag.Message != null)
 {
@@ -14,12 +22,11 @@
 }
 else
 {
-    <h4> @Model.StudentName </h4>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title"> Overall attendance: @Model.OverallPercentage% </h5>
-            <p class="card-text"> You've attended @Model.AttendedSessions of @Model.TotalSessions sessions. </p>
+    <div class="sats-panel d-flex flex-wrap align-items-center gap-4 mb-4">
+        <div class="sats-stat">@Model.OverallPercentage%</div>
+        <div>
+            <strong class="d-block fs-5">Overall attendance</strong>
+            <span class="text-secondary">You've attended @Model.AttendedSessions of @Model.TotalSessions sessions.</span>
         </div>
     </div>
 
@@ -29,29 +36,33 @@ else
     }
     else
     {
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <tr>
-                    <th> Course </th>
-                    <th> Attended </th>
-                    <th> Attendance </th>
-                </tr>
-                @foreach (var course in Model.Courses)
-                {
-                    var barColour = course.Percentage >= 80 ? "bg-success"
-                                  : course.Percentage >= 50 ? "bg-warning"
-                                  : "bg-danger";
-                    <tr>
-                        <td> @course.CourseId - @course.CourseName </td>
-                        <td> @course.AttendedSessions / @course.TotalSessions </td>
-                        <td style="min-width: 150px;">
-                            <div class="progress" role="progressbar" aria-valuenow="@course.Percentage" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar @barColour" style="width: @course.Percentage%"> @course.Percentage% </div>
+        <h2 class="h3 text-body mb-3" style="font-weight: 800;">By course</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            @foreach (var course in Model.Courses)
+            {
+                //Green from 80%, amber from 50%, otherwise red
+                var barColour = course.Percentage >= 80 ? "bg-success"
+                              : course.Percentage >= 50 ? "bg-warning"
+                              : "bg-danger";
+                <div class="col">
+                    <div class="sats-form-card h-100">
+                        <div class="sats-card-head mb-3">
+                            <span class="sats-card-icon"><i class="bi bi-book" aria-hidden="true"></i></span>
+                            <div>
+                                <div class="sats-card-title">@course.CourseId</div>
+                                <div class="text-secondary">@course.CourseName</div>
                             </div>
-                        </td>
-                    </tr>
-                }
-            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <span class="fs-4 fw-bold">@course.Percentage%</span>
+                            <span class="text-secondary">@course.AttendedSessions of @course.TotalSessions sessions</span>
+                        </div>
+                        <div class="progress sats-progress" role="progressbar" aria-label="@course.CourseId attendance" aria-valuenow="@course.Percentage" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar @barColour" style="width: @course.Percentage%"></div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     }
 }

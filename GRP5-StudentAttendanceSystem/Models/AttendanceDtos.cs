@@ -24,6 +24,17 @@
         public string CourseId { get; set; } = "";
         public string CourseName { get; set; } = "";
         public int CheckedInCount { get; set; }
+
+        // Caleb McIntyre - 13/11/2026: the public holiday on this date, if there is one
+        public string? HolidayName { get; set; }
+    }
+
+    // Caleb McIntyre - 13/11/2026
+    //One upcoming public holiday, for the session forms
+    public class HolidayDto
+    {
+        public DateOnly Date { get; set; }
+        public string Name { get; set; } = "";
     }
 
     //What the MVC client sends when a student checks in
@@ -35,6 +46,14 @@
 
     //What the MVC client sends to create a new course session
     public class CreateSessionDto
+    {
+        public string CourseId { get; set; } = "";
+        public DateOnly SessionDate { get; set; }
+    }
+
+    // Caleb McIntyre - 13/11/2026
+    //What the MVC client sends to change a session's course or date
+    public class UpdateSessionDto
     {
         public string CourseId { get; set; } = "";
         public DateOnly SessionDate { get; set; }

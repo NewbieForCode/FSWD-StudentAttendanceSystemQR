@@ -5,29 +5,32 @@
     // Student check-in page (opened by scanning a session's QR code).
     // The "Check in" button sends the request with AJAX, so the page
     // doesn't reload, and shows a success or error message.
+    // Caleb McIntyre - 13/11/2026: restyled as one centred card for phones
     ViewData["Title"] = "Check In";
 }
 
-<h1> Check In </h1>
-
 @if (ViewBag.Message != null)
 {
+    <div class="sats-page-head">
+        <p class="sats-eyebrow">Check in</p>
+        <h1>Check In</h1>
+    </div>
     <div class="alert alert-warning"> @ViewBag.Message </div>
 }
 else
 {
-    <div class="card" style="max-width: 32rem;">
-        <div class="card-body">
-            <h4 class="card-title"> @Model.CourseId - @Model.CourseName </h4>
-            <p class="card-text"> Session on @Model.CSessionDate.ToString("dd/MM/yyyy") </p>
+    <div class="sats-form-card sats-centre-card mt-2">
+        <span class="sats-card-icon"><i class="bi bi-qr-code-scan" aria-hidden="true"></i></span>
+        <p class="sats-eyebrow">Check in</p>
+        <h1 class="h2">@Model.CourseId - @Model.CourseName</h1>
+        <p class="sats-page-text mb-4">Session on @Model.CSessionDate.ToString("dddd d MMMM yyyy")</p>
 
-            <form id="checkInForm" asp-action="Submit" method="post">
-                <input type="hidden" name="token" value="@Model.CSessionQrToken" />
-                <button id="checkInButton" type="submit" class="btn btn-success btn-lg w-100">Check in</button>
-            </form>
+        <form id="checkInForm" asp-action="Submit" method="post">
+            <input type="hidden" name="token" value="@Model.CSessionQrToken" />
+            <button id="checkInButton" type="submit" class="btn btn-primary btn-lg w-100 py-3">Check in</button>
+        </form>
 
-            <div id="checkInMessage" class="alert mt-3 d-none" role="alert"></div>
-        </div>
+        <div id="checkInMessage" class="alert mt-3 mb-0 d-none" role="alert"></div>
     </div>
 }
 

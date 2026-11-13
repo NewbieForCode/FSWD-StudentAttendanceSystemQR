@@ -3,14 +3,18 @@
 @{
     // Caleb McIntyre - 12/11/2026
     // Teacher/Admin page to create a course session
+    // Caleb McIntyre - 13/11/2026: restyled to match the home page
     ViewData["Title"] = "Create Session";
 }
 
-<h1> Create Session </h1>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Course Sessions</p>
+    <h1>Create Session</h1>
+</div>
 
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="CreateSession" method="post">
+        <form asp-action="CreateSession" method="post" class="sats-form-card">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
             <div class="mb-3">
@@ -27,9 +31,14 @@
                 <span asp-validation-for="SessionDate" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-success">Create</button>
-            <a class="btn btn-secondary" asp-action="Sessions">Cancel</a>
+            <div class="sats-form-actions">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a class="btn btn-secondary" asp-action="Sessions">Cancel</a>
+            </div>
         </form>
+    </div>
+    <div class="col-md-5 offset-md-1 mt-4 mt-md-0">
+        <partial name="_HolidayPanel" model="Model.Holidays" />
     </div>
 </div>
 

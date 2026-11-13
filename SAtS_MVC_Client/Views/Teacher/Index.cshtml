@@ -1,13 +1,65 @@
 ﻿@model List<SAtS_MVC_Client.Models.Teacher>
+@{
+    ViewData["Title"] = "Teacher Records";
 
-<h1> Teacher Records </h1>
-<h3> All current teachers active at the University. </h3>
+    // Caleb McIntyre - 13/11/2026: the departments for the filter
+    var departments = Model
+        .Select(t => t.TeacherDepartment)
+        .Where(d => !string.IsNullOrWhiteSpace(d))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(d => d)
+        .ToList();
+}
+
+@* Caleb McIntyre - 13/11/2026: heading and table box match the home page *@
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Records</p>
+    <h1>Teacher Records</h1>
+    <h3> All current teachers active at the University. </h3>
+</div>
+
+@* Fix: show the result of a delete *@
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success"> @TempData["Message"] </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger"> @TempData["Error"] </div>
+}
+
 
 @if (User.IsInRole("Admin"))
 {
-    <a class="btn btn-primary" asp-action="Create">Add Student</a>
+    <p>
+        <a class="btn btn-primary" asp-action="Create">Add Teacher</a>
+    </p>
 }
-<table class="table table-bordered table-striped">
+
+@* Caleb McIntyre - 13/11/2026: filter by department and sort by name *@
+<div class="d-flex flex-wrap gap-3 mb-3">
+    <div style="width: 260px; max-width: 100%;">
+        <label for="departmentFilter" class="form-label">Filter by department:</label>
+        <select id="departmentFilter" class="form-select">
+            <option value="">All Departments</option>
+            @foreach (var department in departments)
+            {
+                <option value="@department">@department</option>
+            }
+        </select>
+    </div>
+    <div style="width: 260px; max-width: 100%;">
+        <label for="sortOrder" class="form-label">Sort by:</label>
+        <select id="sortOrder" class="form-select">
+            <option value="default">Teacher ID</option>
+            <option value="asc">Last name (A to Z)</option>
+            <option value="desc">Last name (Z to A)</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive sats-table-wrap">
+<table id="teachersTable" class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>Teacher ID</th>
@@ -18,14 +70,14 @@
             <th>Department</th>
             @if (User.IsInRole("Admin"))
             {
-                <th></th>
+                <th>Actions</th>
             }
         </tr>
     </thead>
     <tbody>
         @foreach (var teacher in Model)
         {
-            <tr>
+            <tr class="teacher-row" data-department="@teacher.TeacherDepartment" data-last-name="@teacher.TeacherLname" data-first-name="@teacher.TeacherFname">
                 <td>@teacher.TeacherId</td>
                 <td>@teacher.TeacherFname</td>
                 <td>@teacher.TeacherLname</td>
@@ -34,7 +86,7 @@
                 <td>@teacher.TeacherDepartment</td>
                 @if (User.IsInRole("Admin"))
                 {
-                    <td>
+                    <td class="text-nowrap">
                         <a class="btn btn-secondary btn-sm" asp-action="Edit" asp-route-id="@teacher.TeacherId">Edit</a>
                         <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@teacher.TeacherId">Delete</a>
                     </td>
@@ -43,3 +95,44 @@
         }
     </tbody>
 </table>
+</div>
+
+@section Scripts {
+    <script>
+        // Caleb McIntyre - 13/11/2026: filter by department and sort by last name
+        (function () {
+            const filterSelect = document.getElementById("departmentFilter");
+            const sortSelect = document.getElementById("sortOrder");
+            const tbody = document.querySelector("#teachersTable tbody");
+            if (!filterSelect || !sortSelect || !tbody) return;
+
+            //Remember the original order so "Teacher ID" can put it back
+            Array.from(tbody.rows).forEach((row, index) => row.dataset.index = index);
+
+            //Show only the teachers in the chosen department
+            filterSelect.addEventListener("change", function () {
+                const selected = this.value.toUpperCase();
+                document.querySelectorAll(".teacher-row").forEach(row => {
+                    const department = (row.dataset.department || "").toUpperCase();
+                    row.style.display = selected === "" || department === selected ? "" : "none";
+                });
+            });
+
+            //Reorder the rows by last name (then first name)
+            sortSelect.addEventListener("change", function () {
+                const rows = Array.from(tbody.rows);
+                rows.sort((a, b) => {
+                    if (this.value === "default") {
+                        return a.dataset.index - b.dataset.index;
+                    }
+                    let compare = (a.dataset.lastName || "").localeCompare(b.dataset.lastName || "", undefined, { sensitivity: "base" });
+                    if (compare === 0) {
+                        compare = (a.dataset.firstName || "").localeCompare(b.dataset.firstName || "", undefined, { sensitivity: "base" });
+                    }
+                    return this.value === "desc" ? -compare : compare;
+                });
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        })();
+    </script>
+}

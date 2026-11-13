@@ -3,10 +3,14 @@
 @{
     // Caleb McIntyre - 11/11/2026
     // A signed-in student's own student record
+    // Caleb McIntyre - 13/11/2026: restyled to match the home page
     ViewData["Title"] = "My Record";
 }
 
-<h1> My Student Record </h1>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Student</p>
+    <h1>My Student Record</h1>
+</div>
 
 @if (Model == null)
 {
@@ -14,36 +18,44 @@
 }
 else
 {
-    <h3> @Model.StudentFName @Model.StudentLName </h3>
-
-    <table class="table table-bordered table-striped">
-        <tr>
-            <th> Student ID </th>
-            <td> @Model.StudentId </td>
-        </tr>
-        <tr>
-            <th> First Name </th>
-            <td> @Model.StudentFName </td>
-        </tr>
-        <tr>
-            <th> Last Name </th>
-            <td> @Model.StudentLName </td>
-        </tr>
-        <tr>
-            <th> Date of Birth </th>
-            <td> @Model.StudentDob </td>
-        </tr>
-        <tr>
-            <th> Address </th>
-            <td> @Model.StudentStreetAddress, @Model.StudentSuburb, @Model.StudentCity, @Model.StudentPostalCode </td>
-        </tr>
-        <tr>
-            <th> Email </th>
-            <td> @Model.StudentEmail </td>
-        </tr>
-        <tr>
-            <th> Phone </th>
-            <td> @Model.StudentPhone </td>
-        </tr>
-    </table>
+    <div class="row">
+        <div class="col-lg-8 col-xl-7">
+            <div class="sats-form-card">
+                <div class="sats-card-head">
+                    <span class="sats-card-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+                    <h2>@Model.StudentFName @Model.StudentLName</h2>
+                </div>
+                <dl class="sats-details">
+                    <div>
+                        <dt>Student ID</dt>
+                        <dd>@Model.StudentId</dd>
+                    </div>
+                    <div>
+                        <dt>First Name</dt>
+                        <dd>@Model.StudentFName</dd>
+                    </div>
+                    <div>
+                        <dt>Last Name</dt>
+                        <dd>@Model.StudentLName</dd>
+                    </div>
+                    <div>
+                        <dt>Date of Birth</dt>
+                        <dd>@Model.StudentDob</dd>
+                    </div>
+                    <div>
+                        <dt>Address</dt>
+                        <dd>@Model.StudentStreetAddress, @Model.StudentSuburb, @Model.StudentCity, @Model.StudentPostalCode</dd>
+                    </div>
+                    <div>
+                        <dt>Email</dt>
+                        <dd>@Model.StudentEmail</dd>
+                    </div>
+                    <div>
+                        <dt>Phone</dt>
+                        <dd>@Model.StudentPhone</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
 }

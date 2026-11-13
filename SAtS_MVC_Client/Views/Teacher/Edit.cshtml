@@ -1,52 +1,53 @@
 @model SAtS_MVC_Client.Models.Teacher
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Teacher";
 }
 
-<h1>Edit</h1>
+@* Restyled to match the home page: page heading and a form card *@
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Teacher Records</p>
+    <h1>Edit Teacher</h1>
+</div>
 
-<h4>Teacher</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-lg-9 col-xl-8">
+        <form asp-action="Edit" class="sats-form-card">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <input type="hidden" asp-for="TeacherId" />
-            <div class="form-group">
-                <label asp-for="TeacherFname" class="control-label"></label>
-                <input asp-for="TeacherFname" class="form-control" />
-                <span asp-validation-for="TeacherFname" class="text-danger"></span>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="TeacherFname" class="form-label"></label>
+                    <input asp-for="TeacherFname" class="form-control" />
+                    <span asp-validation-for="TeacherFname" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TeacherLname" class="form-label"></label>
+                    <input asp-for="TeacherLname" class="form-control" />
+                    <span asp-validation-for="TeacherLname" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TeacherEmail" class="form-label"></label>
+                    <input asp-for="TeacherEmail" class="form-control" />
+                    <span asp-validation-for="TeacherEmail" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TeacherPhone" class="form-label"></label>
+                    <input asp-for="TeacherPhone" class="form-control" />
+                    <span asp-validation-for="TeacherPhone" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TeacherDepartment" class="form-label"></label>
+                    <input asp-for="TeacherDepartment" class="form-control" />
+                    <span asp-validation-for="TeacherDepartment" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="TeacherLname" class="control-label"></label>
-                <input asp-for="TeacherLname" class="form-control" />
-                <span asp-validation-for="TeacherLname" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TeacherEmail" class="control-label"></label>
-                <input asp-for="TeacherEmail" class="form-control" />
-                <span asp-validation-for="TeacherEmail" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TeacherPhone" class="control-label"></label>
-                <input asp-for="TeacherPhone" class="form-control" />
-                <span asp-validation-for="TeacherPhone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TeacherDepartment" class="control-label"></label>
-                <input asp-for="TeacherDepartment" class="form-control" />
-                <span asp-validation-for="TeacherDepartment" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="sats-form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a class="btn btn-secondary" asp-action="Index">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

@@ -1,72 +1,73 @@
 @model SAtS_MVC_Client.Models.Student
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Student";
 }
 
-<h1>Edit</h1>
+@* Restyled to match the home page: page heading and a form card *@
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Student Records</p>
+    <h1>Edit Student</h1>
+</div>
 
-<h4>Student</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-lg-9 col-xl-8">
+        <form asp-action="Edit" class="sats-form-card">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <input type="hidden" asp-for="StudentId" />
-            <div class="form-group">
-                <label asp-for="StudentFName" class="control-label"></label>
-                <input asp-for="StudentFName" class="form-control" />
-                <span asp-validation-for="StudentFName" class="text-danger"></span>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="StudentFName" class="form-label"></label>
+                    <input asp-for="StudentFName" class="form-control" />
+                    <span asp-validation-for="StudentFName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentLName" class="form-label"></label>
+                    <input asp-for="StudentLName" class="form-control" />
+                    <span asp-validation-for="StudentLName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentDob" class="form-label"></label>
+                    <input asp-for="StudentDob" class="form-control" />
+                    <span asp-validation-for="StudentDob" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentEmail" class="form-label"></label>
+                    <input asp-for="StudentEmail" class="form-control" />
+                    <span asp-validation-for="StudentEmail" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentPhone" class="form-label"></label>
+                    <input asp-for="StudentPhone" class="form-control" />
+                    <span asp-validation-for="StudentPhone" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentStreetAddress" class="form-label"></label>
+                    <input asp-for="StudentStreetAddress" class="form-control" />
+                    <span asp-validation-for="StudentStreetAddress" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentSuburb" class="form-label"></label>
+                    <input asp-for="StudentSuburb" class="form-control" />
+                    <span asp-validation-for="StudentSuburb" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentCity" class="form-label"></label>
+                    <input asp-for="StudentCity" class="form-control" />
+                    <span asp-validation-for="StudentCity" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="StudentPostalCode" class="form-label"></label>
+                    <input asp-for="StudentPostalCode" class="form-control" />
+                    <span asp-validation-for="StudentPostalCode" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="StudentLName" class="control-label"></label>
-                <input asp-for="StudentLName" class="form-control" />
-                <span asp-validation-for="StudentLName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentDob" class="control-label"></label>
-                <input asp-for="StudentDob" class="form-control" />
-                <span asp-validation-for="StudentDob" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentStreetAddress" class="control-label"></label>
-                <input asp-for="StudentStreetAddress" class="form-control" />
-                <span asp-validation-for="StudentStreetAddress" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentSuburb" class="control-label"></label>
-                <input asp-for="StudentSuburb" class="form-control" />
-                <span asp-validation-for="StudentSuburb" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentCity" class="control-label"></label>
-                <input asp-for="StudentCity" class="form-control" />
-                <span asp-validation-for="StudentCity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentPostalCode" class="control-label"></label>
-                <input asp-for="StudentPostalCode" class="form-control" />
-                <span asp-validation-for="StudentPostalCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentEmail" class="control-label"></label>
-                <input asp-for="StudentEmail" class="form-control" />
-                <span asp-validation-for="StudentEmail" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StudentPhone" class="control-label"></label>
-                <input asp-for="StudentPhone" class="form-control" />
-                <span asp-validation-for="StudentPhone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="sats-form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a class="btn btn-secondary" asp-action="Index">Cancel</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

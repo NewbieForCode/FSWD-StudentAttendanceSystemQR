@@ -3,13 +3,17 @@
 @{
     // Caleb McIntyre - 12/11/2026
     // Teacher/Admin page: the students who checked in to one session
+    // Caleb McIntyre - 13/11/2026: restyled to match the home page
     ViewData["Title"] = "Session Attendance";
 }
 
-<h1> Session Attendance </h1>
-<h4> @Model.Session.CourseId - @Model.Session.CourseName, @Model.Session.CSessionDate.ToString("dd/MM/yyyy") </h4>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Course Sessions</p>
+    <h1>Session Attendance</h1>
+    <h3> @Model.Session.CourseId - @Model.Session.CourseName, @Model.Session.CSessionDate.ToString("dd/MM/yyyy") </h3>
+</div>
 
-<p> Students checked in: <strong>@Model.Records.Count</strong> </p>
+<p class="fs-5"> Students checked in: <strong>@Model.Records.Count</strong> </p>
 
 @if (Model.Records.Count == 0)
 {
@@ -17,7 +21,7 @@
 }
 else
 {
-    <div class="table-responsive">
+    <div class="table-responsive sats-table-wrap">
         <table class="table table-bordered table-striped">
             <tr>
                 <th> Student ID </th>
@@ -38,5 +42,7 @@ else
     </div>
 }
 
-<a class="btn btn-primary" asp-action="ShowQr" asp-route-id="@Model.Session.CSessionId">Show QR Code</a>
-<a class="btn btn-secondary" asp-action="Sessions">Back to sessions</a>
+<div class="sats-form-actions">
+    <a class="btn btn-primary" asp-action="ShowQr" asp-route-id="@Model.Session.CSessionId">Show QR Code</a>
+    <a class="btn btn-secondary" asp-action="Sessions">Back to sessions</a>
+</div>

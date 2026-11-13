@@ -1,4 +1,5 @@
 ﻿using GRP5_StudentAttendanceSystem.Models;
+using GRP5_StudentAttendanceSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,12 @@ namespace GRP5_StudentAttendanceSystem.Controllers
     public class StudentAttendanceController : ControllerBase
     {
         private readonly SAtS_Context _context;
+        private readonly PublicHolidayService _holidays;
 
-        public StudentAttendanceController(SAtS_Context context)
+        public StudentAttendanceController(SAtS_Context context, PublicHolidayService holidays)
         {
             _context = context;
+            _holidays = holidays;
         }
 
         // GET api/StudentAttendance/Summary/5
@@ -73,6 +76,14 @@ namespace GRP5_StudentAttendanceSystem.Controllers
                     CourseName = sessionGroup.Key.CourseName,
                     CheckedInCount = sessionGroup.Select(x => x.CheckedInStudentId).Distinct().Count()
                 }).ToListAsync();
+
+            // Caleb McIntyre - 13/11/2026
+            // Combine the database sessions with the NZ public holidays API:
+            // each session that falls on a holiday gets the holiday's name
+            foreach (var session in sessions)
+            {
+                session.HolidayName = (await _holidays.FindHolidayAsync(session.CSessionDate))?.LocalName;
+            }
 
             return Ok(sessions);
         }
@@ -181,6 +192,13 @@ namespace GRP5_StudentAttendanceSystem.Controllers
                 return BadRequest(new { message = "The session date can't be in the past." });
             }
 
+            // Caleb McIntyre - 13/11/2026: sessions can't be on a public holiday
+            var holiday = await _holidays.FindHolidayAsync(request.SessionDate);
+            if (holiday != null)
+            {
+                return BadRequest(new { message = $"{request.SessionDate:dd/MM/yyyy} is {holiday.LocalName}, a public holiday. Please pick another date." });
+            }
+
             //Only one session per course per day
             var duplicate = await _context.TblCourseSessions
                 .AnyAsync(s => s.CourseId == request.CourseId && s.CSessionDate == request.SessionDate);
@@ -234,6 +252,16 @@ namespace GRP5_StudentAttendanceSystem.Controllers
                 }).ToListAsync();
 
             return Ok(records);
+        }
+
+        // Caleb McIntyre - 13/11/2026
+        // GET api/StudentAttendance/Holidays?count=6
+        // The next few NZ public holidays (national, plus Auckland Anniversary Day)
+        [HttpGet("Holidays")]
+        public async Task<IActionResult> GetUpcomingHolidays([FromQuery] int count = 6)
+        {
+            var upcoming = await _holidays.GetUpcomingAsync(Math.Clamp(count, 1, 20));
+            return Ok(upcoming.Select(h => new HolidayDto { Date = h.Date, Name = h.LocalName }));
         }
 
         //Finds one session (with its course name and check-in count) using the given condition

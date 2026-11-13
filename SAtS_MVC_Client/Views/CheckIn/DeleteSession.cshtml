@@ -1,0 +1,61 @@
+﻿@model SAtS_MVC_Client.Models.SessionInfo
+
+@{
+    // Caleb McIntyre - 13/11/2026
+    // Admin/Teacher page to confirm deleting a session (restyled to match the home page)
+    ViewData["Title"] = "Delete Session";
+}
+
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Course Sessions</p>
+    <h1>Delete Session</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-xl-7">
+        @if (Model.CheckedInCount > 0)
+        {
+            <div class="alert alert-danger">
+                @Model.CheckedInCount student(s) have checked in to this session, so it can't be deleted.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                Are you sure you want to delete this session? This can't be undone.
+            </div>
+        }
+
+        <div class="sats-form-card">
+            <div class="sats-card-head">
+                <span class="sats-card-icon"><i class="bi bi-calendar-x" aria-hidden="true"></i></span>
+                <h2>Details</h2>
+            </div>
+            <dl class="sats-details">
+            <div>
+                <dt>Session ID</dt>
+                <dd>@Model.CSessionId</dd>
+            </div>
+            <div>
+                <dt>Course</dt>
+                <dd>@Model.CourseId - @Model.CourseName</dd>
+            </div>
+            <div>
+                <dt>Session Date</dt>
+                <dd>@Model.CSessionDate.ToString("dd/MM/yyyy")</dd>
+            </div>
+            <div>
+                <dt>Checked In</dt>
+                <dd>@Model.CheckedInCount</dd>
+            </div>
+            </dl>
+            <form asp-action="DeleteSession" asp-route-id="@Model.CSessionId" method="post" class="sats-form-actions">
+                @if (Model.CheckedInCount == 0)
+                {
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                }
+                <a class="btn btn-secondary" asp-action="Sessions">Back to sessions</a>
+            </form>
+        </div>
+    </div>
+</div>
