@@ -24,6 +24,15 @@
                 <span asp-validation-for="CourseName" class="text-danger"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="TeacherId">Assigned Teacher</label>
+                <select asp-for="TeacherId" asp-items="ViewBag.Teachers" class="form-select">
+                    <option value="">Select a Teacher</option>
+                </select>
+                <span asp-validation-for="TeacherId" class="text-danger"></span>
+            </div>
+
+
             <button type="submit" class="btn btn-primary">Add</button>
             <a class="btn btn-secondary" asp-action="Index">Cancel</a>
         </form>

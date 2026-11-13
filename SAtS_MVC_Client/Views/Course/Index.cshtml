@@ -44,6 +44,7 @@
         <tr>
             <th>Course ID</th>
             <th>Course Name</th>
+            <th>Teacher</th>
             @if (isAdmin)
             {
                 <th></th>
@@ -55,7 +56,8 @@
         {
             <tr class="course-row" data-course-id="@item.Course.CourseId">
                 <td>@item.Course.CourseId</td>
-                <td>@item.Course.CourseName</td>
+                <td>@item.Course.CourseName</td>   
+                <td>@item.TeacherName</td>
                 @if (isAdmin)
                 {
                     <td>

@@ -33,6 +33,10 @@
       {
          "Name": "[dbo].[tblStudentDetails]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tblTeacherDetails]",
+         "ObjectType": 0
       }
    ],
    "UiHint": null,
