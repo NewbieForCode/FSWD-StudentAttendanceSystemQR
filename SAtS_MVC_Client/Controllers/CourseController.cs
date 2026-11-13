@@ -22,19 +22,15 @@ namespace SAtS_MVC_Client.Controllers
             var course = await _httpClient.GetFromJsonAsync<List<Course>>
                 (CourseApiUrl) ?? new List<Course>();
 
-            var sessions = await _httpClient.GetFromJsonAsync<List<CourseSession>>
-                ("https://localhost:7147/api/CourseSession") ?? new List<CourseSession>();
 
             var teachers = await _httpClient.GetFromJsonAsync<List<Teacher>>
-                ("https://localhost:7147/api/Teacher");
+                ("https://localhost:7147/api/Teacher") ?? new List<Teacher>();
 
             var viewModel = course.Select(course => new CourseViewModel
             {
                 Course = course,
 
-                Sessions = sessions
-                    .Where(session => session.CourseId == course.CourseId)
-                    .ToList(),
+                Sessions = new List<CourseSession>(),
 
                 TeacherName = teachers 
                     .Where(t => t.TeacherId == course.TeacherId)
@@ -81,76 +77,7 @@ namespace SAtS_MVC_Client.Controllers
         }
 
 
-        //---- Course Sessions, Edit and Delete
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditSession(int id)
-        {
-            var session = await _httpClient.GetFromJsonAsync<CourseSession>(
-                $"https://localhost:7147/api/CourseSession/{id}");
-
-            if (session == null)
-            {
-                return NotFound();
-            }
-
-            return View(session);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditSession(CourseSession session)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(session);
-            }
-
-            var response = await _httpClient.PutAsJsonAsync(
-                $"https://localhost:7147/api/CourseSession/{session.CSessionId}", session);
-
-            if (response.IsSuccessStatusCode)
-            {
-                TempData["Message"] = "Course session updated";
-                return RedirectToAction("Index");
-            }
-            
-            
-            TempData["Error"] = "Failed to update course session";
-            return View(session);
-
-        }
-
-
-        //---- Delete course session
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteSession(int id)
-        {
-            var session = await _httpClient.GetFromJsonAsync<CourseSession>(
-                $"https://localhost:7147/api/CourseSession/{id}");
-            if (session == null)
-            {
-                return NotFound();
-            }
-            return View(session);
-        }
-
-        [HttpPost, ActionName("DeleteSession")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteSessionConfirmed(int id)
-        {
-            var response = await _httpClient.DeleteAsync(
-                $"https://localhost:7147/api/CourseSession/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                TempData["Message"] = "Course session deleted";
-            }
-            else
-            {
-                TempData["Error"] = "Failed to delete course session";
-            }
-            return RedirectToAction("Index");
-        }
-
+        // Caleb McIntyre - 13/11/2026: session Edit/Delete moved to CheckInController (Course Sessions page)
 
         //------------------------------------------------------------
         // Caleb McIntyre - 12/11/2026
@@ -182,6 +109,7 @@ namespace SAtS_MVC_Client.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 ModelState.AddModelError(string.Empty, await ReadApiMessage(response));
+                await LoadTeachers(course.TeacherId); // Fix: the page needs its teacher list again
                 return View(course);
             }
 
@@ -225,6 +153,7 @@ namespace SAtS_MVC_Client.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 ModelState.AddModelError(string.Empty, await ReadApiMessage(response));
+                await LoadTeachers(course.TeacherId); // Fix: the page needs its teacher list again
                 return View(course);
             }
 

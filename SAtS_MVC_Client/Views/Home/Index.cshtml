@@ -1,8 +1,145 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    // Caleb McIntyre - 13/11/2026
+    // Home page: greeting, quick-action cards for the user's role,
+    // and how QR check-in works.
+    ViewData["Title"] = "Home";
+
+    var signedIn = SignInManager.IsSignedIn(User);
+    var isAdmin = User.IsInRole("Admin");
+    var isTeacher = User.IsInRole("Teacher");
+    var isStudent = User.IsInRole("Student");
+
+    //First name from the Full Name, otherwise the start of the email
+    var firstName = "";
+    if (signedIn)
+    {
+        var user = await UserManager.GetUserAsync(User);
+        var name = !string.IsNullOrWhiteSpace(user?.FullName) ? user!.FullName! : (user?.Email ?? "").Split('@')[0];
+        firstName = name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+    }
+
+    string eyebrow = "Group 5 · Manukau Institute of Technology";
+    string heading = "Student Attendance System";
+    if (signedIn)
+    {
+        eyebrow = isAdmin ? "Admin" : isTeacher ? "Teacher" : isStudent ? "Student" : "Welcome";
+        heading = string.IsNullOrEmpty(firstName) ? "Kia ora" : $"Kia ora, {firstName}";
+    }
+
+    //Quick-action cards: icon, title, description, link text, link
+    var cards = new List<(string Icon, string Title, string Text, string LinkText, string Url)>();
+    if (!signedIn)
+    {
+        cards.Add(("bi-box-arrow-in-right", "Log in", "Use your email and password, or sign in with Google.", "Log in", Url.Page("/Account/Login", new { area = "Identity" })!));
+        cards.Add(("bi-person-plus", "Register", "New student? Create an account with your full name and email.", "Register", Url.Page("/Account/Register", new { area = "Identity" })!));
+        cards.Add(("bi-book", "Course Records", "See the courses that are running.", "View courses", Url.Action("Index", "Course")!));
+    }
+    else if (isAdmin)
+    {
+        cards.Add(("bi-shield-check", "Users and roles", "Give accounts the Admin, Teacher or Student role, or delete them.", "Manage users", Url.Action("Index", "Admin")!));
+        cards.Add(("bi-book", "Courses", "Add, edit and delete courses, and assign their teachers.", "Manage courses", Url.Action("Index", "Course")!));
+        cards.Add(("bi-calendar-event", "Course Sessions", "Create sessions, show QR codes and check attendance.", "View sessions", Url.Action("Sessions", "CheckIn")!));
+        cards.Add(("bi-people", "Student Records", "Look up, add and edit students.", "View students", Url.Action("Index", "Student")!));
+        cards.Add(("bi-person-badge", "Teacher Records", "Look up, add and edit teachers.", "View teachers", Url.Action("Index", "Teacher")!));
+    }
+    else if (isTeacher)
+    {
+        cards.Add(("bi-calendar-event", "Course Sessions", "Show a session's QR code, or see who has checked in.", "View sessions", Url.Action("Sessions", "CheckIn")!));
+        cards.Add(("bi-plus-circle", "Create Session", "Pick a course and a date to make a new session.", "Create session", Url.Action("CreateSession", "CheckIn")!));
+        cards.Add(("bi-people", "Student Records", "Look up students and their contact details.", "View students", Url.Action("Index", "Student")!));
+        cards.Add(("bi-book", "Courses", "All the courses that are running.", "View courses", Url.Action("Index", "Course")!));
+    }
+    else
+    {
+        cards.Add(("bi-qr-code-scan", "Check in", "Scan the QR code your teacher shows in class to check in.", "How it works", "#how-it-works"));
+        cards.Add(("bi-bar-chart", "My Attendance", "Sessions attended for each of your courses, as a percentage.", "View attendance", Url.Action("MyAttendance", "Student")!));
+        cards.Add(("bi-person-vcard", "My Record", "Your contact details and address on file.", "View record", Url.Action("MyRecord", "Student")!));
+        cards.Add(("bi-book", "Courses", "All the courses that are running.", "View courses", Url.Action("Index", "Course")!));
+    }
+
+    //The two buttons in the header
+    var primary = cards[0];
+    var secondary = cards[1];
+    if (signedIn && !isAdmin && !isTeacher)
+    {
+        //Students: My Attendance and My Record (Check in needs the QR code)
+        primary = cards[1];
+        secondary = cards[2];
+    }
+    if (!signedIn)
+    {
+        secondary = (secondary.Icon, secondary.Title, secondary.Text, "Create an account", secondary.Url);
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="sats-hero">
+    <div class="sats-hero-inner">
+        <div class="row align-items-center g-4">
+            <div class="col-md-8">
+                <p class="sats-eyebrow">@eyebrow</p>
+                <h1>@heading</h1>
+                <p class="lead mt-3">Teachers put a QR code up in class. Students scan it to check in, and their attendance is recorded straight away.</p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a class="btn btn-primary btn-lg" href="@primary.Url">@(signedIn ? primary.Title : "Log in")</a>
+                    <a class="btn btn-outline-dark btn-lg" href="@secondary.Url">@(signedIn ? secondary.Title : secondary.LinkText)</a>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <img class="sats-hero-logo" src="~/images/bwlogo.png" alt="" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="actions-heading" class="mb-5">
+    <h2 id="actions-heading" class="h3 text-body mb-3" style="font-weight: 800;">What would you like to do?</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+        @foreach (var card in cards)
+        {
+            <div class="col">
+                <a class="sats-card" href="@card.Url">
+                    <span class="sats-card-icon"><i class="bi @card.Icon" aria-hidden="true"></i></span>
+                    <span class="sats-card-title">@card.Title</span>
+                    <span class="sats-card-text">@card.Text</span>
+                    <span class="sats-card-link">@card.LinkText <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<section id="how-it-works" aria-labelledby="how-heading" class="mb-4">
+    <h2 id="how-heading" class="h3 text-body mb-3" style="font-weight: 800;">How check-in works</h2>
+    <ol class="list-unstyled row row-cols-1 row-cols-md-3 g-3">
+        <li class="col">
+            <div class="sats-step">
+                <span class="sats-step-number">1</span>
+                <div>
+                    <strong class="d-block fs-5">The teacher creates a session</strong>
+                    <span class="text-secondary">Pick the course and the date on the Course Sessions page.</span>
+                </div>
+            </div>
+        </li>
+        <li class="col">
+            <div class="sats-step">
+                <span class="sats-step-number">2</span>
+                <div>
+                    <strong class="d-block fs-5">The QR code goes on screen</strong>
+                    <span class="text-secondary">Each session gets its own code, made by the goQR.me API.</span>
+                </div>
+            </div>
+        </li>
+        <li class="col">
+            <div class="sats-step">
+                <span class="sats-step-number">3</span>
+                <div>
+                    <strong class="d-block fs-5">Students scan and check in</strong>
+                    <span class="text-secondary">One tap records the time. It only works on the day of the session.</span>
+                </div>
+            </div>
+        </li>
+    </ol>
+</section>

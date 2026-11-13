@@ -1,5 +1,35 @@
+/* ============================================================
+   Caleb McIntyre - 13/11/2026
+   SAtS site theme, based on the home page mockup:
+   black, white and greys from the logo, the logo's green and
+   teal on the dark nav bar, one deep teal accent for buttons
+   and links, and the rounded Nunito font.
+   ============================================================ */
+
+:root {
+  --sats-ink: #141414;          /* main text */
+  --sats-muted: #555555;        /* secondary text */
+  --sats-nav: #2B2D2F;          /* dark grey nav bar */
+  --sats-nav-text: #D3D6D8;     /* nav links */
+  --sats-green: #03AB72;        /* logo green (nav underline) */
+  --sats-teal: #00C7B6;         /* logo teal (Login button) */
+  --sats-accent: #0E6B6B;       /* buttons and links */
+  --sats-accent-dark: #0A4F4F;  /* hover */
+  --sats-surface: #F3F4F4;      /* light grey panels */
+  --sats-border: #E2E4E4;       /* card and table borders */
+
+  /* Point Bootstrap's own colours at the theme */
+  --bs-body-font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bs-body-color: var(--sats-ink);
+  --bs-link-color: var(--sats-accent);
+  --bs-link-color-rgb: 14, 107, 107;
+  --bs-link-hover-color: var(--sats-accent-dark);
+  --bs-link-hover-color-rgb: 10, 79, 79;
+  --bs-border-radius: 0.75rem;
+}
+
 html {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 @media (min-width: 768px) {
@@ -8,19 +38,291 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* The footer sits at the bottom of short pages */
 body {
-  margin-bottom: 60px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
 }
 
+.sats-main {
+  flex: 1 0 auto;
+}
+
+h1, h2, h3, h4, h5 {
+  font-weight: 800;
+  color: var(--sats-ink);
+}
+
+h3 {
+  font-weight: 600;
+  color: var(--sats-muted);
+  font-size: 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- Nav bar ---------- */
+.sats-navbar {
+  background: var(--sats-nav);
+  border-bottom: 3px solid var(--sats-green);
+}
+
+.sats-navbar .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+}
+
+.sats-navbar .navbar-brand:hover {
+  color: #ffffff;
+}
+
+.sats-navbar .navbar-brand img {
+  width: 44px;
+  height: 44px;
+}
+
+.sats-navbar .nav-link {
+  color: var(--sats-nav-text);
+  font-weight: 600;
+}
+
+.sats-navbar .nav-link:hover,
+.sats-navbar .nav-link:focus {
+  color: #ffffff;
+}
+
+.sats-navbar .sats-hello {
+  color: var(--sats-nav-text);
+  font-weight: 600;
+}
+
+.sats-navbar .btn-sats-logout {
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-weight: 700;
+  background: transparent;
+}
+
+.sats-navbar .btn-sats-logout:hover {
+  background: #ffffff;
+  color: var(--sats-ink);
+}
+
+.sats-navbar .btn-sats-login {
+  background: var(--sats-teal);
+  color: var(--sats-ink);
+  border-radius: 999px;
+  padding: 0.35rem 1.1rem;
+  font-weight: 700;
+}
+
+.sats-navbar .btn-sats-login:hover {
+  background: #ffffff;
+  color: var(--sats-ink);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  border-radius: 999px;
+  font-weight: 700;
+  padding-left: 1.1rem;
+  padding-right: 1.1rem;
+}
+
+.btn-sm {
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--sats-accent);
+  --bs-btn-border-color: var(--sats-accent);
+  --bs-btn-hover-bg: var(--sats-accent-dark);
+  --bs-btn-hover-border-color: var(--sats-accent-dark);
+  --bs-btn-active-bg: var(--sats-accent-dark);
+  --bs-btn-active-border-color: var(--sats-accent-dark);
+  --bs-btn-disabled-bg: var(--sats-accent);
+  --bs-btn-disabled-border-color: var(--sats-accent);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--sats-accent);
+  --bs-btn-border-color: var(--sats-accent);
+  --bs-btn-hover-bg: var(--sats-accent);
+  --bs-btn-hover-border-color: var(--sats-accent);
+  --bs-btn-active-bg: var(--sats-accent-dark);
+  --bs-btn-active-border-color: var(--sats-accent-dark);
+}
+
+.btn-secondary {
+  --bs-btn-bg: var(--sats-ink);
+  --bs-btn-border-color: var(--sats-ink);
+  --bs-btn-hover-bg: #3a3a3a;
+  --bs-btn-hover-border-color: #3a3a3a;
+}
+
+.btn-outline-dark {
+  border-width: 2px;
+}
+
+.btn:focus-visible, .btn-link.nav-link:focus-visible, .form-control:focus, .form-select:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem #ffffff, 0 0 0 0.3rem rgba(14, 107, 107, 0.55);
+  border-color: var(--sats-accent);
+}
+
+.form-check-input:checked {
+  background-color: var(--sats-accent);
+  border-color: var(--sats-accent);
+}
+
+/* ---------- Tables ---------- */
+.table {
+  border-color: var(--sats-border);
+}
+
+.table th {
+  background: var(--sats-surface);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+/* ---------- Home page ---------- */
+.sats-hero {
+  background: var(--sats-surface);
+  border-radius: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.sats-hero-inner {
+  padding: 3rem 2rem;
+}
+
+@media (min-width: 768px) {
+  .sats-hero-inner {
+    padding: 3.5rem 3rem;
+  }
+}
+
+.sats-eyebrow {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--sats-accent);
+  margin-bottom: 0.5rem;
+}
+
+.sats-hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+.sats-hero .lead {
+  font-size: 1.2rem;
+  color: #444444;
+  max-width: 560px;
+}
+
+.sats-hero-logo {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+}
+
+.sats-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  padding: 1.5rem;
+  border: 2px solid var(--sats-border);
+  border-radius: 1rem;
+  background: #ffffff;
+  color: var(--sats-ink);
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.sats-card:hover,
+.sats-card:focus {
+  border-color: var(--sats-accent);
+  color: var(--sats-ink);
+  transform: translateY(-2px);
+}
+
+.sats-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--sats-ink);
+  color: #ffffff;
+  font-size: 1.6rem;
+}
+
+.sats-card-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.sats-card-text {
+  color: var(--sats-muted);
+  line-height: 1.5;
+}
+
+.sats-card-link {
+  margin-top: auto;
+  font-weight: 700;
+  color: var(--sats-accent);
+}
+
+.sats-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  height: 100%;
+  padding: 1.25rem;
+  background: var(--sats-surface);
+  border-radius: 1rem;
+}
+
+.sats-step-number {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid var(--sats-ink);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+/* ---------- Footer ---------- */
+.sats-footer {
+  border-top: 2px solid var(--sats-ink);
+  color: var(--sats-muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Identity form placeholders (from the template) ---------- */
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -28,4 +330,181 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* Caleb McIntyre - 13/11/2026
+   The header now stays at the top of the screen, so links that jump
+   to a section (like "How it works") stop below it instead of under it. */
+[id] {
+  scroll-margin-top: 90px;
+}
+
+/* Caleb McIntyre - 13/11/2026
+   A light grey rounded panel, like the home page's sections
+   (used for side panels such as upcoming public holidays). */
+.sats-panel {
+  background: var(--sats-surface);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+/* ============================================================
+   Caleb McIntyre - 13/11/2026
+   Shared styles so every page matches the home page:
+   white cards with a light grey border, rounded tables,
+   and a small coloured label above each page heading.
+   ============================================================ */
+
+/* Page heading block: eyebrow, heading and a short description */
+.sats-page-head {
+  margin-bottom: 1.5rem;
+}
+
+.sats-page-head h1 {
+  margin-bottom: 0.35rem;
+}
+
+.sats-page-head h3,
+.sats-page-head .sats-page-text {
+  margin-bottom: 0;
+}
+
+.sats-page-text {
+  color: var(--sats-muted);
+  font-size: 1.1rem;
+}
+
+/* White card with a border, like the home page cards (without the hover) */
+.sats-form-card {
+  background: #ffffff;
+  border: 2px solid var(--sats-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .sats-form-card {
+    padding: 2rem;
+  }
+}
+
+.sats-form-card .form-label {
+  font-weight: 700;
+}
+
+.sats-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Icon title row inside a card */
+.sats-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.sats-card-head .sats-card-icon {
+  flex: 0 0 auto;
+}
+
+.sats-card-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+/* Label and value list for Delete pages and My Record */
+.sats-details {
+  margin: 0;
+}
+
+.sats-details > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--sats-border);
+}
+
+.sats-details > div:last-child {
+  border-bottom: 0;
+}
+
+.sats-details dt {
+  flex: 0 0 11rem;
+  font-weight: 700;
+  color: var(--sats-muted);
+}
+
+.sats-details dd {
+  flex: 1 1 14rem;
+  margin: 0;
+}
+
+/* Tables sit in a rounded box with the same border as the cards */
+.sats-table-wrap {
+  border: 2px solid var(--sats-border);
+  border-radius: 1rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  background: #ffffff;
+}
+
+.sats-table-wrap > .table {
+  margin-bottom: 0;
+  border-style: hidden;
+}
+
+/* Big number panels (My Attendance) */
+.sats-stat {
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--sats-ink);
+}
+
+.sats-progress {
+  height: 0.9rem;
+  border-radius: 999px;
+  background: var(--sats-surface);
+}
+
+.sats-progress .progress-bar {
+  border-radius: 999px;
+}
+
+/* Check-in and QR pages: one centred card */
+.sats-centre-card {
+  max-width: 34rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sats-centre-card .sats-card-icon {
+  margin: 0 auto 1rem;
+}
+
+.sats-qr {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  padding: 0.75rem;
+  border: 2px solid var(--sats-border);
+  border-radius: 1rem;
+  background: #ffffff;
+}
+
+/* Sign in with Google and other external providers */
+.btn-sats-provider {
+  border: 2px solid var(--sats-ink);
+  color: var(--sats-ink);
+  background: #ffffff;
+}
+
+.btn-sats-provider:hover {
+  background: var(--sats-ink);
+  color: #ffffff;
 }

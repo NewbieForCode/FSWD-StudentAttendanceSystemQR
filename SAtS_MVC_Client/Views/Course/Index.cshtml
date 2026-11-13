@@ -6,8 +6,12 @@
     var isAdmin = User.IsInRole("Admin");
 }
 
-<h1> Course Records </h1>
-<h3> Current courses offered by the university.</h3>
+@* Caleb McIntyre - 13/11/2026: heading and table box match the home page *@
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Records</p>
+    <h1>Course Records</h1>
+    <h3> Current courses offered by the university.</h3>
+</div>
 
 @if (TempData["Message"] != null)
 {
@@ -25,21 +29,30 @@
     </p>
 }
 
-<!-- Filter -->
-<form asp-controller="Course" asp-action="Index" method="get">
-    <label for="courseFilter">Filter by ID:</label>
+<!-- Filter and sort -->
+<div class="d-flex flex-wrap gap-3 mb-3">
+    <div style="width: 260px; max-width: 100%;">
+        <label for="courseFilter" class="form-label">Filter by ID:</label>
+        <select id="courseFilter" class="form-select">
+            <option value="">All Courses</option>
+            @foreach (var prefix in ViewBag.CoursePrefixes)
+            {
+                <option value="@prefix">@prefix</option>
+            }
+        </select>
+    </div>
+    <div style="width: 260px; max-width: 100%;">
+        <label for="sortOrder" class="form-label">Sort by:</label>
+        <select id="sortOrder" class="form-select">
+            <option value="default">Default order</option>
+            <option value="asc">Course ID (A to Z)</option>
+            <option value="desc">Course ID (Z to A)</option>
+        </select>
+    </div>
+</div>
 
-    <select id="courseFilter" class="form-select">
-        <option value="">All Courses</option>
-
-        @foreach (var prefix in ViewBag.CoursePrefixes)
-        {
-            <option value="@prefix">@prefix</option>
-        }
-    </select>
-</form>
-
-<table class="table table-bordered table-striped">
+<div class="table-responsive sats-table-wrap">
+<table id="coursesTable" class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>Course ID</th>
@@ -47,7 +60,7 @@
             <th>Teacher</th>
             @if (isAdmin)
             {
-                <th></th>
+                <th>Actions</th>
             }
         </tr>
     </thead>
@@ -69,47 +82,10 @@
         }
     </tbody>
 </table>
+</div>
 
 
-<br /> <br />
-<h1> Course Sessions </h1>
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Course ID</th>
-            <th>Session ID</th>
-            <th>Session Date</th>
-            <th>QR Token</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            @foreach (var session in item.Sessions)
-            {
-                // Testing QR Code gen for the sessions 
-                string qrContent = $"https://localhost:7147/api/CourseSession/{session.CSessionId}/qrcode";
-                string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(qrContent)}";
-                <tr class="session-row" data-course-id="@session.CourseId">
-                    <td>@session.CourseId</td>
-                    <td>@session.CSessionId</td>
-                    <td>@session.CSessionDate</td>
-                    <td>@session.CSessionQrtoken</td>
-                    <td><img src="@qrUrl" alt="QR Code" width="30" height="30" /></td>
-                    @if (isAdmin)
-                    {
-                        <td>
-                            <a class="btn btn-secondary btn-sm" asp-action="EditSession" asp-route-id="@session.CSessionId">Edit</a>
-                            <a class="btn btn-danger btn-sm" asp-action="DeleteSession" asp-route-id="@session.CSessionId">Delete</a>
-                        </td>
-                    }
-                </tr>
-            }
-        }
-        
-    </tbody>
-</table>
+@* Caleb McIntyre - 13/11/2026: the Course Sessions table moved to the Course Sessions page *@
 
 <script>
     document.getElementById("courseFilter").addEventListener("change", function () {
@@ -126,14 +102,29 @@
                     : "none";
         });
 
-        
-        document.querySelectorAll(".session-row").forEach(row => {
-
-            const courseId = row.dataset.courseId.toUpperCase();
-            row.style.display =
-                selectedPrefix === "" || courseId.startsWith(selectedPrefix)
-                    ? ""
-                    : "none";
-        });
     });
+
+    // Caleb McIntyre - 13/11/2026: sort the table rows by course ID
+    (function () {
+        const sortSelect = document.getElementById("sortOrder");
+        const tbody = document.querySelector("#coursesTable tbody");
+        if (!sortSelect || !tbody) return;
+
+        //Remember the original order so "Default order" can put it back
+        Array.from(tbody.rows).forEach((row, index) => row.dataset.index = index);
+
+        sortSelect.addEventListener("change", function () {
+            const rows = Array.from(tbody.rows);
+            rows.sort((a, b) => {
+                if (this.value === "default") {
+                    return a.dataset.index - b.dataset.index;
+                }
+                const compare = a.dataset.courseId.localeCompare(b.dataset.courseId, undefined, { numeric: true, sensitivity: "base" });
+                //Same course: keep the original order
+                const result = compare !== 0 ? compare : a.dataset.index - b.dataset.index;
+                return this.value === "desc" ? -result : result;
+            });
+            rows.forEach(row => tbody.appendChild(row));
+        });
+    })();
 </script>

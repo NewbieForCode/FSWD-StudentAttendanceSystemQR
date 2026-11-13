@@ -1,90 +1,68 @@
 @model SAtS_MVC_Client.Models.Student
 
 @{
-    ViewData["Title"] = "Delete";
+    // Restyled to match the home page: details in a card
+    ViewData["Title"] = "Delete Student";
 }
 
-<h1>Delete</h1>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Student Records</p>
+    <h1>Delete Student</h1>
+</div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>SAtS_MVC_Client.Models.Student</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentFName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentFName)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentLName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentLName)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentDob)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentDob)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentStreetAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentStreetAddress)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentSuburb)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentSuburb)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentCity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentCity)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentPostalCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentPostalCode)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentEmail)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentEmail)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StudentPhone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StudentPhone)
-        </dd>
-    </dl>
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="StudentId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<div class="row">
+    <div class="col-lg-8 col-xl-7">
+        <div class="alert alert-warning">
+            Are you sure you want to delete this student? This can't be undone.
+        </div>
+        <div class="sats-form-card">
+            <div class="sats-card-head">
+                <span class="sats-card-icon"><i class="bi bi-person" aria-hidden="true"></i></span>
+                <h2>Details</h2>
+            </div>
+            <dl class="sats-details">
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentFName)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentFName)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentLName)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentLName)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentDob)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentDob)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentStreetAddress)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentStreetAddress)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentSuburb)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentSuburb)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentCity)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentCity)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentPostalCode)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentPostalCode)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentEmail)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentEmail)</dd>
+            </div>
+            <div>
+                <dt>@Html.DisplayNameFor(model => model.StudentPhone)</dt>
+                <dd>@Html.DisplayFor(model => model.StudentPhone)</dd>
+            </div>
+            </dl>
+            <form asp-action="Delete" method="post" class="sats-form-actions">
+                <input type="hidden" asp-for="StudentId" />
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+            </form>
+        </div>
+    </div>
 </div>

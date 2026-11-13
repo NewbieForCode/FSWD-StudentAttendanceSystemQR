@@ -1,6 +1,49 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    // Caleb McIntyre - 13/11/2026: privacy page, styled to match the home page
+    ViewData["Title"] = "Privacy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Student Attendance System</p>
+    <h1>Privacy</h1>
+    <h3>What SAtS stores about you, and why.</h3>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+    <div class="col">
+        <div class="sats-form-card h-100">
+            <div class="sats-card-head">
+                <span class="sats-card-icon"><i class="bi bi-person-lock" aria-hidden="true"></i></span>
+                <h2>Your account</h2>
+            </div>
+            <p class="sats-card-text mb-0">Your full name, email address and a securely hashed password. If you sign in with Google, we only receive your name and email address from Google.</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="sats-form-card h-100">
+            <div class="sats-card-head">
+                <span class="sats-card-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+                <h2>Student records</h2>
+            </div>
+            <p class="sats-card-text mb-0">Contact details and address, so teachers and administrators can look up enrolled students. Students can see their own record on the My Record page.</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="sats-form-card h-100">
+            <div class="sats-card-head">
+                <span class="sats-card-icon"><i class="bi bi-calendar-check" aria-hidden="true"></i></span>
+                <h2>Attendance</h2>
+            </div>
+            <p class="sats-card-text mb-0">The session you checked in to and the time you checked in. This is used to work out attendance percentages for each course.</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="sats-form-card h-100">
+            <div class="sats-card-head">
+                <span class="sats-card-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+                <h2>Who can see it</h2>
+            </div>
+            <p class="sats-card-text mb-0">Only signed-in teachers and administrators can see student records and attendance. Your information isn't shared outside the system.</p>
+        </div>
+    </div>
+</div>

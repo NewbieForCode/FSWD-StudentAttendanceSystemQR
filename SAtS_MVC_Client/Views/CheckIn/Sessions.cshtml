@@ -1,19 +1,53 @@
 ﻿@model List<SAtS_MVC_Client.Models.SessionInfo>
 
 @{
-    // Caleb McIntyre - 12/11/2026
-    // Teacher page: pick a session to show its check-in QR code
+    // Caleb McIntyre - 12/11/2026, updated 13/11/2026
+    // Course Sessions: the sessions table moved here from Course Records,
+    // with Show QR Code, View Attendance, Edit and Delete for Admins and Teachers.
     ViewData["Title"] = "Course Sessions";
     var today = DateOnly.FromDateTime(DateTime.Now);
 }
 
-<h1> Course Sessions </h1>
-<h3> Show a session's check-in QR code, or see who attended. </h3>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Teaching</p>
+    <h1>Course Sessions</h1>
+    <h3> Show a session's check-in QR code, see who attended, or change a session. </h3>
+</div>
 
-@* Caleb McIntyre - 12/11/2026: Create Session button *@
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success"> @TempData["Message"] </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger"> @TempData["Error"] </div>
+}
+
 <p>
-    <a class="btn btn-success" asp-action="CreateSession">Create Session</a>
+    <a class="btn btn-primary" asp-action="CreateSession">Create Session</a>
 </p>
+
+<!-- Filter and sort -->
+<div class="d-flex flex-wrap gap-3 mb-3">
+    <div style="width: 260px; max-width: 100%;">
+        <label for="courseFilter" class="form-label">Filter by ID:</label>
+        <select id="courseFilter" class="form-select">
+            <option value="">All Courses</option>
+            @foreach (var prefix in ViewBag.CoursePrefixes)
+            {
+                <option value="@prefix">@prefix</option>
+            }
+        </select>
+    </div>
+    <div style="width: 260px; max-width: 100%;">
+        <label for="sortOrder" class="form-label">Sort by:</label>
+        <select id="sortOrder" class="form-select">
+            <option value="default">Date (newest first)</option>
+            <option value="asc">Course ID (A to Z)</option>
+            <option value="desc">Course ID (Z to A)</option>
+        </select>
+    </div>
+</div>
 
 @if (Model.Count == 0)
 {
@@ -21,32 +55,87 @@
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <tr>
-                <th> Date </th>
-                <th> Course </th>
-                <th> Checked In </th>
-                <th></th>
-            </tr>
-            @foreach (var session in Model)
-            {
-                <tr class="@(session.CSessionDate == today ? "table-success" : "")">
-                    <td>
-                        @session.CSessionDate.ToString("dd/MM/yyyy")
-                        @if (session.CSessionDate == today)
-                        {
-                            <span class="badge bg-success">Today</span>
-                        }
-                    </td>
-                    <td> @session.CourseId - @session.CourseName </td>
-                    <td> @session.CheckedInCount </td>
-                    <td>
-                        <a class="btn btn-primary btn-sm" asp-action="ShowQr" asp-route-id="@session.CSessionId">Show QR Code</a>
-                        <a class="btn btn-secondary btn-sm" asp-action="SessionAttendance" asp-route-id="@session.CSessionId">View Attendance</a>
-                    </td>
+    <div class="table-responsive sats-table-wrap">
+        <table id="sessionsTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Course ID</th>
+                    <th>Session ID</th>
+                    <th>Session Date</th>
+                    <th>QR Token</th>
+                    <th>Checked In</th>
+                    <th>Actions</th>
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @foreach (var session in Model)
+                {
+                    <tr class="session-row @(session.CSessionDate == today ? "table-success" : "")" data-course-id="@session.CourseId">
+                        <td>@session.CourseId</td>
+                        <td>@session.CSessionId</td>
+                        <td>
+                            @session.CSessionDate.ToString("dd/MM/yyyy")
+                            @if (session.CSessionDate == today)
+                            {
+                                <span class="badge bg-success">Today</span>
+                            }
+                            @* Caleb McIntyre - 13/11/2026: sessions on a public holiday (from the Nager.Date API) *@
+                            @if (!string.IsNullOrEmpty(session.HolidayName))
+                            {
+                                <span class="badge text-bg-warning" title="NZ public holiday">Public holiday: @session.HolidayName</span>
+                            }
+                        </td>
+                        <td><small class="font-monospace">@session.CSessionQrToken</small></td>
+                        <td>@session.CheckedInCount</td>
+                        <td class="text-nowrap">
+                            <a class="btn btn-primary btn-sm" asp-action="ShowQr" asp-route-id="@session.CSessionId">Show QR Code</a>
+                            <a class="btn btn-outline-primary btn-sm" asp-action="SessionAttendance" asp-route-id="@session.CSessionId">View Attendance</a>
+                            <a class="btn btn-secondary btn-sm" asp-action="EditSession" asp-route-id="@session.CSessionId">Edit</a>
+                            <a class="btn btn-danger btn-sm" asp-action="DeleteSession" asp-route-id="@session.CSessionId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
+}
+
+@section Scripts {
+    <script>
+        //Show only the sessions whose course ID starts with the chosen prefix
+        document.getElementById("courseFilter").addEventListener("change", function () {
+            const selectedPrefix = this.value.toUpperCase();
+            document.querySelectorAll(".session-row").forEach(row => {
+                const courseId = row.dataset.courseId.toUpperCase();
+                row.style.display =
+                    selectedPrefix === "" || courseId.startsWith(selectedPrefix)
+                        ? ""
+                        : "none";
+            });
+        });
+
+        // Caleb McIntyre - 13/11/2026: sort the table rows by course ID
+        (function () {
+            const sortSelect = document.getElementById("sortOrder");
+            const tbody = document.querySelector("#sessionsTable tbody");
+            if (!sortSelect || !tbody) return;
+
+            //Remember the original order so "Date (newest first)" can put it back
+            Array.from(tbody.rows).forEach((row, index) => row.dataset.index = index);
+
+            sortSelect.addEventListener("change", function () {
+                const rows = Array.from(tbody.rows);
+                rows.sort((a, b) => {
+                    if (this.value === "default") {
+                        return a.dataset.index - b.dataset.index;
+                    }
+                    const compare = a.dataset.courseId.localeCompare(b.dataset.courseId, undefined, { numeric: true, sensitivity: "base" });
+                    //Same course: keep the original order
+                    const result = compare !== 0 ? compare : a.dataset.index - b.dataset.index;
+                    return this.value === "desc" ? -result : result;
+                });
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        })();
+    </script>
 }

@@ -24,7 +24,7 @@ namespace SAtS_MVC_Client.Controllers
         public async Task<IActionResult> Index(string? searchInput)
         {
             var students = await _httpClient.GetFromJsonAsync<List<Student>>
-                ("https://localhost:7147/api/Student");
+                ("https://localhost:7147/api/Student") ?? new List<Student>();
 
             if (!string.IsNullOrEmpty(searchInput))
             {
@@ -134,12 +134,15 @@ namespace SAtS_MVC_Client.Controllers
         {
             var response = await _httpClient.DeleteAsync
                 ($"https://localhost:7147/api/Student/{id}");
-
-            if (!response.IsSuccessStatusCode)
+            // Fix: show whether the delete worked (the error was being lost on redirect)
+            if (response.IsSuccessStatusCode)
             {
-                ModelState.AddModelError(string.Empty, "Failed to delete student.");
+                TempData["Message"] = "Student deleted.";
             }
-
+            else
+            {
+                TempData["Error"] = await ReadApiMessage(response, "Failed to delete student.");
+            }
             return RedirectToAction(nameof(Index));
         }
 
@@ -189,6 +192,30 @@ namespace SAtS_MVC_Client.Controllers
             };
 
             return View(model);
+        }
+
+        // Fix: reads the "message" the API sends back when something fails
+        private static async Task<string> ReadApiMessage(HttpResponseMessage response, string fallback)
+        {
+            try
+            {
+                var body = await response.Content.ReadFromJsonAsync<ApiMessage>();
+                if (!string.IsNullOrWhiteSpace(body?.Message))
+                {
+                    return body.Message;
+                }
+            }
+            catch
+            {
+                //The response wasn't JSON, so use the general message
+            }
+
+            return fallback;
+        }
+
+        private class ApiMessage
+        {
+            public string? Message { get; set; }
         }
 
         //Gets the email of the signed-in account

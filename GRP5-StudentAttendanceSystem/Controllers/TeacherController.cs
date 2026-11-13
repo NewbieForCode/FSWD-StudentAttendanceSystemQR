@@ -75,8 +75,15 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             var teacher = await _context.TblTeacherDetails.FindAsync(id);
             if (teacher == null)
             {
-                return NotFound();
+                return NotFound(new { message = "That teacher doesn't exist." });
             }
+
+            // Fix: a teacher who still has courses can't be deleted (the database would refuse)
+            if (await _context.TblCourses.AnyAsync(c => c.TeacherId == id))
+            {
+                return Conflict(new { message = $"{teacher.TeacherFname} {teacher.TeacherLname} still teaches a course. Give their courses to another teacher first." });
+            }
+
             _context.TblTeacherDetails.Remove(teacher);
             await _context.SaveChangesAsync();
             return NoContent();

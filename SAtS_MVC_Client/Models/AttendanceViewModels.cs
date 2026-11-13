@@ -42,6 +42,17 @@ namespace SAtS_MVC_Client.Models
         public string CourseId { get; set; } = "";
         public string CourseName { get; set; } = "";
         public int CheckedInCount { get; set; }
+
+        // Caleb McIntyre - 13/11/2026: the public holiday on this date, if there is one
+        public string? HolidayName { get; set; }
+    }
+
+    // Caleb McIntyre - 13/11/2026
+    //An upcoming NZ public holiday (from the Nager.Date API, through our API)
+    public class HolidayInfo
+    {
+        public DateOnly Date { get; set; }
+        public string Name { get; set; } = "";
     }
 
     //The page a teacher shows on screen with the session's QR code
@@ -75,6 +86,21 @@ namespace SAtS_MVC_Client.Models
 
         //The options for the course drop-down
         public List<SelectListItem> Courses { get; set; } = new List<SelectListItem>();
+
+        // Caleb McIntyre - 13/11/2026: upcoming public holidays, shown beside the form
+        public List<HolidayInfo> Holidays { get; set; } = new List<HolidayInfo>();
+    }
+
+    // Caleb McIntyre - 13/11/2026
+    //The Edit Session form (same fields as Create Session, plus which session it is)
+    public class EditSessionViewModel : CreateSessionViewModel
+    {
+        public int CSessionId { get; set; }
+
+        //The date before editing, so an old session can keep its date
+        public DateOnly OriginalDate { get; set; }
+
+        public string QrToken { get; set; } = "";
     }
 
     //One student who checked in to a session

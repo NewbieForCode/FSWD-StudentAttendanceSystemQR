@@ -69,6 +69,9 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             studentChange.StudentStreetAddress = student.StudentStreetAddress;
             studentChange.StudentSuburb = student.StudentSuburb;
             studentChange.StudentCity = student.StudentCity;
+            // Fix: date of birth and postal code weren't being saved
+            studentChange.StudentDob = student.StudentDob;
+            studentChange.StudentPostalCode = student.StudentPostalCode;
 
             await _context.SaveChangesAsync();
             return NoContent();
@@ -80,8 +83,15 @@ namespace GRP5_StudentAttendanceSystem.Controllers
             var student = await _context.TblStudentDetails.FindAsync(id);
             if (student == null)
             {
-                return NotFound();
+                return NotFound(new { message = "That student doesn't exist." });
             }
+
+            // Fix: a student with attendance records can't be deleted (the database would refuse)
+            if (await _context.TblAttendanceRecords.AnyAsync(r => r.StudentId == id))
+            {
+                return Conflict(new { message = $"{student.StudentFname} {student.StudentLname} has attendance records, so they can't be deleted." });
+            }
+
             _context.TblStudentDetails.Remove(student);
             await _context.SaveChangesAsync();
             return NoContent(); 

@@ -3,16 +3,19 @@
 @{
     // Caleb McIntyre - 12/11/2026
     // Custom Register page with the extra Full Name field
+    // Caleb McIntyre - 13/11/2026: restyled to match the home page
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">New account</p>
+    <h1>Register</h1>
+    <h3>Create an account with your full name and email.</h3>
+</div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
+<div class="row g-4">
+    <div class="col-md-7 col-lg-5">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="sats-form-card">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.FullName" class="form-control" autocomplete="name" aria-required="true" placeholder="Jane Doe" />
@@ -35,31 +38,36 @@
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <p class="text-center mt-3 mb-0">
+                Already have an account? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Log in</a>
+            </p>
         </form>
     </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
+    <div class="col-md-5 col-lg-4">
+        <section class="sats-panel">
+            <h2 class="h5 mb-2">Use another service to register</h2>
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
                 {
-                    <div>
-                        <p>
-                            There are no external authentication services configured.
-                        </p>
-                    </div>
+                    <p class="text-secondary mb-0">
+                        There are no external authentication services configured.
+                    </p>
                 }
                 else
                 {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+                    <p class="text-secondary small mb-3">Your name and email come from the service you pick.</p>
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div class="d-grid gap-2">
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <button type="submit" class="btn btn-sats-provider" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                    @if (provider.Name == "Google")
+                                    {
+                                        <i class="bi bi-google me-1" aria-hidden="true"></i>
+                                    }
+                                    Continue with @provider.DisplayName
+                                </button>
+                            }
                         </div>
                     </form>
                 }

@@ -1,0 +1,55 @@
+﻿@model List<SAtS_MVC_Client.Models.HolidayInfo>
+
+@*
+    Caleb McIntyre - 13/11/2026
+    Upcoming NZ public holidays (national + Auckland Anniversary Day),
+    from the Nager.Date API. Sessions can't be booked on these dates.
+    The script warns straight away if the chosen date is one of them.
+*@
+
+<div class="sats-panel">
+    <h2 class="h5 mb-2"><i class="bi bi-calendar-x" aria-hidden="true"></i> Upcoming public holidays</h2>
+    <p class="text-secondary small mb-3">Sessions can't be booked on a public holiday.</p>
+    @if (Model.Count == 0)
+    {
+        <p class="text-secondary small mb-0">The holiday list couldn't be loaded right now. Holiday dates are still checked when you save.</p>
+    }
+    else
+    {
+        <ul class="list-unstyled mb-0" id="holidayList">
+            @foreach (var holiday in Model.Take(6))
+            {
+                <li class="d-flex justify-content-between gap-3 py-1 border-bottom">
+                    <span>@holiday.Name</span>
+                    <span class="text-secondary text-nowrap">@holiday.Date.ToString("ddd d MMM yyyy")</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+<div id="holidayWarning" class="alert alert-warning mt-3 d-none" role="alert"></div>
+
+<script>
+    //Warn as soon as a holiday date is picked (the server checks again on save)
+    (function () {
+        const holidays = @Json.Serialize(Model.Select(h => new { date = h.Date.ToString("yyyy-MM-dd"), name = h.Name }));
+        const dateInput = document.getElementById("SessionDate");
+        const warning = document.getElementById("holidayWarning");
+        if (!dateInput || !warning) return;
+
+        function checkDate() {
+            const match = holidays.find(h => h.date === dateInput.value);
+            if (match) {
+                warning.textContent = "That date is " + match.name + ", a public holiday. Please pick another date.";
+                warning.classList.remove("d-none");
+            } else {
+                warning.classList.add("d-none");
+            }
+        }
+
+        dateInput.addEventListener("change", checkDate);
+        dateInput.addEventListener("input", checkDate);
+        checkDate();
+    })();
+</script>

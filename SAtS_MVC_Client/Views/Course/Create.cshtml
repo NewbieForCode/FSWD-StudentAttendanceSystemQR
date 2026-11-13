@@ -2,14 +2,18 @@
 
 @{
     // Caleb McIntyre - 12/11/2026: Admin page to add a course
+    // Caleb McIntyre - 13/11/2026: restyled to match the home page
     ViewData["Title"] = "Add Course";
 }
 
-<h1> Add Course </h1>
+<div class="sats-page-head">
+    <p class="sats-eyebrow">Course Records</p>
+    <h1>Add Course</h1>
+</div>
 
 <div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
+    <div class="col-lg-7 col-xl-6">
+        <form asp-action="Create" method="post" class="sats-form-card">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
             <div class="mb-3">
@@ -25,7 +29,7 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="TeacherId">Assigned Teacher</label>
+                <label asp-for="TeacherId" class="form-label">Assigned Teacher</label>
                 <select asp-for="TeacherId" asp-items="ViewBag.Teachers" class="form-select">
                     <option value="">Select a Teacher</option>
                 </select>
@@ -33,8 +37,10 @@
             </div>
 
 
-            <button type="submit" class="btn btn-primary">Add</button>
-            <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+            <div class="sats-form-actions">
+                <button type="submit" class="btn btn-primary">Add</button>
+                <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+            </div>
         </form>
     </div>
 </div>

@@ -32,8 +32,18 @@ namespace SAtS_MVC_Client.Controllers
         [Authorize(Roles = "Admin, Teacher")]
         public async Task<IActionResult> Sessions()
         {
-            var sessions = await _httpClient.GetFromJsonAsync<List<SessionInfo>>(ApiBaseUrl + "StudentAttendance/Sessions");
-            return View(sessions ?? new List<SessionInfo>());
+            var sessions = await _httpClient.GetFromJsonAsync<List<SessionInfo>>(ApiBaseUrl + "StudentAttendance/Sessions")
+                           ?? new List<SessionInfo>();
+
+            // Caleb McIntyre - 13/11/2026: course filter options (moved from Course Records)
+            ViewBag.CoursePrefixes = sessions
+                .Select(s => new string(s.CourseId.TakeWhile(char.IsLetter).ToArray()))
+                .Where(prefix => !string.IsNullOrEmpty(prefix))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(prefix => prefix)
+                .ToList();
+
+            return View(sessions);
         }
 
         //GET: /CheckIn/ShowQr/5
@@ -78,6 +88,7 @@ namespace SAtS_MVC_Client.Controllers
         {
             var model = new CreateSessionViewModel();
             model.Courses = await GetCourseOptions();
+            model.Holidays = await GetUpcomingHolidays();
             return View(model);
         }
 
@@ -96,6 +107,7 @@ namespace SAtS_MVC_Client.Controllers
             if (!ModelState.IsValid)
             {
                 model.Courses = await GetCourseOptions();
+                model.Holidays = await GetUpcomingHolidays();
                 return View(model);
             }
 
@@ -106,6 +118,7 @@ namespace SAtS_MVC_Client.Controllers
             {
                 ModelState.AddModelError(string.Empty, await ReadApiMessage(response));
                 model.Courses = await GetCourseOptions();
+                model.Holidays = await GetUpcomingHolidays();
                 return View(model);
             }
 
@@ -115,6 +128,119 @@ namespace SAtS_MVC_Client.Controllers
             //Go straight to the new session's QR code
             return RedirectToAction(nameof(ShowQr), new { id = session?.CSessionId });
         }
+
+        //------------------------------------------------------------
+        // Caleb McIntyre - 13/11/2026
+        // Edit and delete a course session (moved here from Course Records).
+        // Admins and Teachers can use these.
+        //------------------------------------------------------------
+
+        //GET: /CheckIn/EditSession/5
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> EditSession(int id)
+        {
+            var session = await GetSessionInfo(id);
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditSessionViewModel
+            {
+                CSessionId = session.CSessionId,
+                CourseId = session.CourseId,
+                SessionDate = session.CSessionDate,
+                OriginalDate = session.CSessionDate,
+                QrToken = session.CSessionQrToken,
+                Courses = await GetCourseOptions(),
+                Holidays = await GetUpcomingHolidays()
+            };
+
+            return View(model);
+        }
+
+        //POST: /CheckIn/EditSession/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> EditSession(int id, EditSessionViewModel model)
+        {
+            if (id != model.CSessionId)
+            {
+                return BadRequest();
+            }
+
+            //Server-side validation: a session can't be moved to a date in the past
+            if (model.SessionDate != model.OriginalDate && model.SessionDate < DateOnly.FromDateTime(DateTime.Now))
+            {
+                ModelState.AddModelError(nameof(model.SessionDate), "The session date can't be moved into the past.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Courses = await GetCourseOptions();
+                model.Holidays = await GetUpcomingHolidays();
+                return View(model);
+            }
+
+            var response = await _httpClient.PutAsJsonAsync(ApiBaseUrl + "CourseSession/" + id,
+                new { CourseId = model.CourseId, SessionDate = model.SessionDate });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError(string.Empty, await ReadApiMessage(response));
+                model.Courses = await GetCourseOptions();
+                model.Holidays = await GetUpcomingHolidays();
+                return View(model);
+            }
+
+            TempData["Message"] = $"Session {id} updated.";
+            return RedirectToAction(nameof(Sessions));
+        }
+
+        //GET: /CheckIn/DeleteSession/5
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> DeleteSession(int id)
+        {
+            var session = await GetSessionInfo(id);
+            if (session == null)
+            {
+                return NotFound();
+            }
+
+            return View(session);
+        }
+
+        //POST: /CheckIn/DeleteSession/5
+        [HttpPost, ActionName("DeleteSession")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, Teacher")]
+        public async Task<IActionResult> DeleteSessionConfirmed(int id)
+        {
+            var response = await _httpClient.DeleteAsync(ApiBaseUrl + "CourseSession/" + id);
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Message"] = $"Session {id} deleted.";
+            }
+            else
+            {
+                TempData["Error"] = await ReadApiMessage(response);
+            }
+
+            return RedirectToAction(nameof(Sessions));
+        }
+
+        //Gets one session (with course name and check-in count), or null if it doesn't exist
+        private async Task<SessionInfo?> GetSessionInfo(int id)
+        {
+            var response = await _httpClient.GetAsync(ApiBaseUrl + "StudentAttendance/Session/" + id);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+            return await response.Content.ReadFromJsonAsync<SessionInfo>();
+        }
+        //------------------------------------------------------------
 
         //GET: /CheckIn/SessionAttendance/5
         //The students who checked in to one session
@@ -138,6 +264,22 @@ namespace SAtS_MVC_Client.Controllers
             };
 
             return View(model);
+        }
+
+        // Caleb McIntyre - 13/11/2026
+        //The next NZ public holidays, from our API (which gets them from Nager.Date).
+        //If that fails the form still works: the API still blocks holiday dates.
+        private async Task<List<HolidayInfo>> GetUpcomingHolidays()
+        {
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<List<HolidayInfo>>(ApiBaseUrl + "StudentAttendance/Holidays?count=12")
+                       ?? new List<HolidayInfo>();
+            }
+            catch
+            {
+                return new List<HolidayInfo>();
+            }
         }
 
         //The courses for the Create Session drop-down
