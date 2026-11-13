@@ -8,13 +8,13 @@ namespace SAtS_MVC_Client.Controllers
 {
     public class CourseController : Controller
     {
-        private const string CourseApiUrl = "https://localhost:7147/api/Course";
+        private const string CourseApiUrl = "api/Course";
 
         private readonly HttpClient _httpClient;
 
         public CourseController(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClientFactory.CreateClient("SAtSApi");
         }
 
         public async Task<IActionResult> Index(string? courseFilter)
@@ -24,7 +24,7 @@ namespace SAtS_MVC_Client.Controllers
 
 
             var teachers = await _httpClient.GetFromJsonAsync<List<Teacher>>
-                ("https://localhost:7147/api/Teacher") ?? new List<Teacher>();
+                ("api/Teacher") ?? new List<Teacher>();
 
             var viewModel = course.Select(course => new CourseViewModel
             {
@@ -63,7 +63,7 @@ namespace SAtS_MVC_Client.Controllers
         private async Task LoadTeachers(int? selectedTeacherId = null)
         {
             var teachers = await _httpClient.GetFromJsonAsync<List<Teacher>>
-                ("https://localhost:7147/api/Teacher") ?? new List<Teacher>();
+                ("api/Teacher") ?? new List<Teacher>();
 
             ViewBag.Teachers = new SelectList(teachers.Select(t => new 
             { 
