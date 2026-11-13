@@ -16,14 +16,14 @@ namespace SAtS_MVC_Client.Controllers
     //------------------------------------------------------------
     public class CheckInController : Controller
     {
-        private const string ApiBaseUrl = "https://localhost:7147/api/";
+        private const string ApiBaseUrl = "api/";
 
         private readonly HttpClient _httpClient;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public CheckInController(IHttpClientFactory httpClientFactory, UserManager<ApplicationUser> userManager)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClientFactory.CreateClient("SAtSApi");
             _userManager = userManager;
         }
 

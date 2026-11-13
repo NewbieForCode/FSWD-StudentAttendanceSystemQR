@@ -30,7 +30,21 @@ builder.Services.AddAuthentication().AddGoogle(options =>
 });
 //------------------------------------------------------------
 
-builder.Services.AddHttpClient();
+//------------------------------------------------------------
+// Fix: the API's address comes from configuration ("ApiBaseUrl"),
+// so the site works on Azure as well as locally. Locally it's
+// https://localhost:7147/ (appsettings.json); on Azure it's set as
+// an App Service setting pointing at the deployed API.
+//------------------------------------------------------------
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:7147/";
+if (!apiBaseUrl.EndsWith("/"))
+{
+    apiBaseUrl += "/";
+}
+builder.Services.AddHttpClient("SAtSApi", client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+});
 
 var app = builder.Build();
 

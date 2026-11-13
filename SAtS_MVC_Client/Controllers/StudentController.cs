@@ -16,7 +16,7 @@ namespace SAtS_MVC_Client.Controllers
 
         public StudentController(IHttpClientFactory httpClientFactory, UserManager<ApplicationUser> userManager)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClientFactory.CreateClient("SAtSApi");
             _userManager = userManager;
         }
 
@@ -24,7 +24,7 @@ namespace SAtS_MVC_Client.Controllers
         public async Task<IActionResult> Index(string? searchInput)
         {
             var students = await _httpClient.GetFromJsonAsync<List<Student>>
-                ("https://localhost:7147/api/Student") ?? new List<Student>();
+                ("api/Student") ?? new List<Student>();
 
             if (!string.IsNullOrEmpty(searchInput))
             {
@@ -58,7 +58,7 @@ namespace SAtS_MVC_Client.Controllers
             }
 
             var response = await _httpClient.PostAsJsonAsync
-                ("https://localhost:7147/api/Student", student);
+                ("api/Student", student);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -74,7 +74,7 @@ namespace SAtS_MVC_Client.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var student = await _httpClient.GetFromJsonAsync<Student>
-                ($"https://localhost:7147/api/Student/{id}");
+                ($"api/Student/{id}");
 
             if (student == null)
             {
@@ -100,7 +100,7 @@ namespace SAtS_MVC_Client.Controllers
             }
 
             var response = await _httpClient.PutAsJsonAsync
-                ($"https://localhost:7147/api/Student/{id}", student);
+                ($"api/Student/{id}", student);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -117,7 +117,7 @@ namespace SAtS_MVC_Client.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var student = await _httpClient.GetFromJsonAsync<Student>
-                ($"https://localhost:7147/api/Student/{id}");
+                ($"api/Student/{id}");
 
             if (student == null)
             {
@@ -133,7 +133,7 @@ namespace SAtS_MVC_Client.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var response = await _httpClient.DeleteAsync
-                ($"https://localhost:7147/api/Student/{id}");
+                ($"api/Student/{id}");
             // Fix: show whether the delete worked (the error was being lost on redirect)
             if (response.IsSuccessStatusCode)
             {
@@ -183,7 +183,7 @@ namespace SAtS_MVC_Client.Controllers
             }
 
             var courses = await _httpClient.GetFromJsonAsync<List<CourseAttendanceViewModel>>
-                ("https://localhost:7147/api/StudentAttendance/Summary/" + student.StudentId);
+                ("api/StudentAttendance/Summary/" + student.StudentId);
 
             var model = new MyAttendanceViewModel
             {
@@ -231,7 +231,7 @@ namespace SAtS_MVC_Client.Controllers
             var email = await GetSignedInEmail();
 
             var response = await _httpClient.GetAsync
-                ("https://localhost:7147/api/Student/ByEmail?email=" + Uri.EscapeDataString(email));
+                ("api/Student/ByEmail?email=" + Uri.EscapeDataString(email));
 
             if (!response.IsSuccessStatusCode)
             {
