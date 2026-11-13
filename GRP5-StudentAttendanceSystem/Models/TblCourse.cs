@@ -23,6 +23,13 @@ public partial class TblCourse
     [Unicode(false)]
     public string CourseName { get; set; }
 
+    [Column("teacherID")]
+    public int TeacherId { get; set; }
+
     [InverseProperty("Course")]
     public virtual ICollection<TblCourseSession> TblCourseSessions { get; set; } = new List<TblCourseSession>();
+
+    [ForeignKey("TeacherId")]
+    [InverseProperty("TblCourses")]
+    public virtual TblTeacherDetail Teacher { get; set; }
 }

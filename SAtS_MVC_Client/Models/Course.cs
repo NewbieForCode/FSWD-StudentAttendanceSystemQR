@@ -16,5 +16,9 @@ namespace SAtS_MVC_Client.Models
         [StringLength(50, ErrorMessage = "The course name can be at most 50 characters.")]
         [Display(Name = "Course Name")]
         public string CourseName { get; set; } = "";
+
+        [Required(ErrorMessage = "Please enter a teacher ID.")]
+        [Display(Name = "Teacher ID")]
+        public int TeacherId { get; set; }
     }
 }

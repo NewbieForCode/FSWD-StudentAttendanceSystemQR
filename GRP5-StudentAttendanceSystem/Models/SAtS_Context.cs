@@ -21,6 +21,8 @@ public partial class SAtS_Context : DbContext
 
     public virtual DbSet<TblStudentDetail> TblStudentDetails { get; set; }
 
+    public virtual DbSet<TblTeacherDetail> TblTeacherDetails { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TblAttendanceRecord>(entity =>
@@ -41,6 +43,10 @@ public partial class SAtS_Context : DbContext
         modelBuilder.Entity<TblCourse>(entity =>
         {
             entity.HasKey(e => e.CourseId).HasName("PK__tblCours__2AA84FF11C708605");
+
+            entity.HasOne(d => d.Teacher).WithMany(p => p.TblCourses)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_tblCourses_tblTeacherDetails");
         });
 
         modelBuilder.Entity<TblCourseSession>(entity =>
@@ -59,6 +65,13 @@ public partial class SAtS_Context : DbContext
             entity.HasKey(e => e.StudentId).HasName("PK__tblStude__4D11D65C9CBEE71A");
 
             entity.Property(e => e.StudentId).ValueGeneratedNever();
+        });
+
+        modelBuilder.Entity<TblTeacherDetail>(entity =>
+        {
+            entity.HasKey(e => e.TeacherId).HasName("PK__tblTeach__98E9387526E151D5");
+
+            entity.Property(e => e.TeacherId).ValueGeneratedNever();
         });
 
         OnModelCreatingPartial(modelBuilder);

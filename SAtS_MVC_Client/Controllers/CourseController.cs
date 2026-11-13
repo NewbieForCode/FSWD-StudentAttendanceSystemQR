@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SAtS_MVC_Client.Models;
 using System.Net.Http.Json;
 
@@ -24,13 +25,21 @@ namespace SAtS_MVC_Client.Controllers
             var sessions = await _httpClient.GetFromJsonAsync<List<CourseSession>>
                 ("https://localhost:7147/api/CourseSession") ?? new List<CourseSession>();
 
+            var teachers = await _httpClient.GetFromJsonAsync<List<Teacher>>
+                ("https://localhost:7147/api/Teacher");
+
             var viewModel = course.Select(course => new CourseViewModel
             {
                 Course = course,
 
                 Sessions = sessions
                     .Where(session => session.CourseId == course.CourseId)
-                    .ToList()
+                    .ToList(),
+
+                TeacherName = teachers 
+                    .Where(t => t.TeacherId == course.TeacherId)
+                    .Select(t => t.TeacherFname + " " + t.TeacherLname)
+                    .FirstOrDefault() ?? "Unassigned"
 
             }).ToList();
 
@@ -51,6 +60,24 @@ namespace SAtS_MVC_Client.Controllers
 
             ViewBag.CoursePrefixes = coursePrefixes;
             return View(viewModel);
+        }
+
+
+        //--- add teacher dropdown to create and edit
+        private async Task LoadTeachers(int? selectedTeacherId = null)
+        {
+            var teachers = await _httpClient.GetFromJsonAsync<List<Teacher>>
+                ("https://localhost:7147/api/Teacher") ?? new List<Teacher>();
+
+            ViewBag.Teachers = new SelectList(teachers.Select(t => new 
+            { 
+                t.TeacherId,
+                FullName = t.TeacherFname + " " + t.TeacherLname
+            }),
+                "TeacherId",
+                "FullName",
+                selectedTeacherId
+            );
         }
 
 
@@ -132,8 +159,9 @@ namespace SAtS_MVC_Client.Controllers
 
         //GET: /Course/Create
         [Authorize(Roles = "Admin")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await LoadTeachers(); //New Addition 
             return View(new Course());
         }
 
@@ -146,6 +174,7 @@ namespace SAtS_MVC_Client.Controllers
             //Server-side validation
             if (!ModelState.IsValid)
             {
+                await LoadTeachers(course.TeacherId); //New Addition
                 return View(course);
             }
 
@@ -157,6 +186,7 @@ namespace SAtS_MVC_Client.Controllers
             }
 
             TempData["Message"] = $"Added the course {course.CourseId.ToUpper()} - {course.CourseName}.";
+            await LoadTeachers(course.TeacherId);
             return RedirectToAction(nameof(Index));
         }
 
@@ -170,6 +200,7 @@ namespace SAtS_MVC_Client.Controllers
                 return NotFound();
             }
 
+            await LoadTeachers(course.TeacherId);
             return View(course);
         }
 
@@ -186,6 +217,7 @@ namespace SAtS_MVC_Client.Controllers
 
             if (!ModelState.IsValid)
             {
+                await LoadTeachers(course.TeacherId);
                 return View(course);
             }
 
@@ -197,6 +229,8 @@ namespace SAtS_MVC_Client.Controllers
             }
 
             TempData["Message"] = $"Updated the course {course.CourseId}.";
+            await LoadTeachers(course.TeacherId);
+
             return RedirectToAction(nameof(Index));
         }
 

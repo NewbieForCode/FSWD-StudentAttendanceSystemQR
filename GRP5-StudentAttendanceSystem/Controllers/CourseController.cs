@@ -56,7 +56,7 @@ namespace GRP5_StudentAttendanceSystem.Controllers
                 return Conflict(new { message = $"A course with the ID {course.CourseId} already exists." });
             }
 
-            _context.TblCourses.Add(new TblCourse { CourseId = course.CourseId, CourseName = course.CourseName });
+            _context.TblCourses.Add(new TblCourse { CourseId = course.CourseId, CourseName = course.CourseName, TeacherId = course.TeacherId });
             await _context.SaveChangesAsync();
 
             return Ok(new { course.CourseId, course.CourseName });
