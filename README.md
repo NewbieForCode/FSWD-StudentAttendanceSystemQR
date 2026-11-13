@@ -8,7 +8,9 @@ Expected features:
 - Course Sessions with CRUD
 - External API for QR Generation (https://goqr.me/)
 
-Created with ASP.NET Web API and ASP.NET Web Core MVC. 
+Deployed to Azure on 13/11/2026: https://grp5satsfswdd-h4cmbbc8arc9grbe.malaysiawest-01.azurewebsites.net/
+
+Created with ASP.NET Web API and ASP.NET Web Core MVC.
 Project started on September 29th 2026.
 
 This is a student project made for academic purposes. 
