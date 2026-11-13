@@ -10,4 +10,5 @@ Expected features:
 
 Created with ASP.NET Web API and ASP.NET Web Core MVC. 
 Project started on September 29th 2026.
+
 This is a student project made for academic purposes. 
